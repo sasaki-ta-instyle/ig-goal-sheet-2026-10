@@ -59,9 +59,11 @@ export interface CurrentStatusRow {
 }
 
 export interface SmartGoalRow {
-  goal: string;
-  targetValue: string;
-  deadline: string;
+  s: string;
+  m: string;
+  a: string;
+  r: string;
+  t: string;
   note: string;
 }
 
@@ -221,7 +223,7 @@ export function createDefaultFormData(): FormData {
         { label: 'それを受けてどう行動したか', value: '' },
         { label: '今期の役割・期待（自己認識）', value: '' },
       ],
-      smartGoals: Array(3).fill(null).map(() => ({ goal: '', targetValue: '', deadline: '', note: '' })),
+      smartGoals: Array(3).fill(null).map(() => ({ s: '', m: '', a: '', r: '', t: '', note: '' })),
       kpiContribs: Array(3).fill(null).map(() => ({ deptKpi: '', myPart: '' })),
       slLevel: '',
       slNote: '',

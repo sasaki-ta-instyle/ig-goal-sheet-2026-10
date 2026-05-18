@@ -9,9 +9,33 @@ import PersonalGoalForm from '@/components/forms/PersonalGoalForm';
 import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
-import { createDefaultFormData, CURRENT_PERIOD, FormData } from '@/lib/types';
+import { createDefaultFormData, CURRENT_PERIOD, FormData, SmartGoalRow } from '@/lib/types';
 
 const STORAGE_KEY = 'instyle-goal-sheet-2026-10-v1';
+
+// 旧 SmartGoalRow（goal/targetValue/deadline/note）→ 新 SmartGoalRow（s/m/a/r/t/note）に
+// 写し替える。旧 goal→s、旧 targetValue→m、旧 deadline→t、note はそのまま。
+// 配列長は新デフォルト（3 件）に揃え、不足は空行で補完、超過は切り捨て。
+type LegacySmartGoalRow = Partial<SmartGoalRow> & {
+  goal?: string;
+  targetValue?: string;
+  deadline?: string;
+};
+function normalizeSmartGoals(input: unknown, defaults: SmartGoalRow[]): SmartGoalRow[] {
+  if (!Array.isArray(input)) return defaults;
+  return defaults.map((def, i) => {
+    const raw = input[i] as LegacySmartGoalRow | undefined;
+    if (!raw || typeof raw !== 'object') return def;
+    return {
+      s: raw.s ?? raw.goal ?? '',
+      m: raw.m ?? raw.targetValue ?? '',
+      a: raw.a ?? '',
+      r: raw.r ?? '',
+      t: raw.t ?? raw.deadline ?? '',
+      note: raw.note ?? '',
+    };
+  });
+}
 
 // 旧バージョンの JSON / localStorage を読み込んだ場合に新フィールドが undefined になり
 // 下流のレンダリングや PPTX 生成が落ちるのを防ぐ正規化ヘルパ。
@@ -32,7 +56,11 @@ function mergeFormData(parsed: unknown): FormData {
       kgi1: { ...def.dept.kgi1, ...(p.dept?.kgi1 ?? {}) },
       kgi2: { ...def.dept.kgi2, ...(p.dept?.kgi2 ?? {}) },
     },
-    personal: { ...def.personal, ...(p.personal ?? {}) },
+    personal: {
+      ...def.personal,
+      ...(p.personal ?? {}),
+      smartGoals: normalizeSmartGoals(p.personal?.smartGoals, def.personal.smartGoals),
+    },
     promotion: { ...def.promotion, ...(p.promotion ?? {}) },
     bonus: { ...def.bonus, ...(p.bonus ?? {}) },
     gradeExpectations: { ...def.gradeExpectations, ...(p.gradeExpectations ?? {}) },
@@ -301,7 +329,7 @@ function ConfirmView({ data }: { data: FormData }) {
     { label: '氏名', value: data.cover.name || '（未入力）' },
     { label: 'グレード', value: data.cover.grade || '（未入力）' },
     { label: '期', value: data.cover.period || '（未入力）' },
-    { label: '個人目標数', value: `${data.personal.smartGoals.filter(r => r.goal).length} 件` },
+    { label: '個人目標数', value: `${data.personal.smartGoals.filter(r => r.s || r.m || r.a || r.r || r.t).length} 件` },
     { label: '昇格評価合計', value: promotionLabel },
     { label: 'ボーナス支給額', value: phase1Total >= 3 ? `${(phase2Total * 110000).toLocaleString('ja-JP')}円` : '0円（財務ゲート未通過）' },
   ];

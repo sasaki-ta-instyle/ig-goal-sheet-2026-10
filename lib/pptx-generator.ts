@@ -51,7 +51,7 @@ function addSectionLabel(sl: pptxgen.Slide, y: number, label: string) {
   });
 }
 
-function addTable(sl: pptxgen.Slide, y: number, headers: string[], rows: string[][], colWidths: number[]) {
+function addTable(sl: pptxgen.Slide, y: number, headers: string[], rows: string[][], colWidths: number[], rowH: number | number[] = 0.28) {
   const tableData: pptxgen.TableRow[] = [];
 
   tableData.push(headers.map(h => ({
@@ -82,11 +82,13 @@ function addTable(sl: pptxgen.Slide, y: number, headers: string[], rows: string[
   const totalW = colWidths.reduce((a, b) => a + b, 0);
   const actualWidths = colWidths.map(w => (w / totalW) * (W - 0.8));
 
+  const resolvedRowH = Array.isArray(rowH) ? [0.28, ...rowH] : rowH;
+
   sl.addTable(tableData, {
     x: 0.4, y,
     w: W - 0.8,
     colW: actualWidths,
-    rowH: 0.28,
+    rowH: resolvedRowH,
     autoPage: false,
   });
 }
@@ -263,12 +265,28 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   // ② SMART個人目標
   addSectionLabel(sl, y, '② SMART個人目標');
   y += 0.3;
-  const smartRows = c.smartGoals.map((r) => [
-    r.goal || '—', r.targetValue || '—', r.deadline || '—', r.note || '—',
-  ]);
-  addTable(sl, y, ['目標（Specific）', '目標値', '期限', '備考・関連目標'], smartRows,
-    [5.3, 1.5, 1.3, 2.5]);
-  y += 0.3 + smartRows.length * 0.3;
+  const SMART_LABELS: { key: 's' | 'm' | 'a' | 'r' | 't'; label: string }[] = [
+    { key: 's', label: 'S' },
+    { key: 'm', label: 'M' },
+    { key: 'a', label: 'A' },
+    { key: 'r', label: 'R' },
+    { key: 't', label: 'T' },
+  ];
+  const smartRows = c.smartGoals.map((r) => {
+    const lines = SMART_LABELS
+      .map(({ key, label }) => ({ label, value: r[key] }))
+      .filter(({ value }) => value && value.trim() !== '')
+      .map(({ label, value }) => `${label}: ${value}`);
+    const goalCell = lines.length > 0 ? lines.join('\n') : '—';
+    return [goalCell, r.note || '—'];
+  });
+  const smartRowH = smartRows.map(([cell]) => {
+    const lineCount = cell === '—' ? 1 : cell.split('\n').length;
+    return Math.max(0.32, 0.22 + lineCount * 0.18);
+  });
+  addTable(sl, y, ['SMART個人目標（S/M/A/R/T）', '備考・関連目標'], smartRows,
+    [7.6, 2.4], smartRowH);
+  y += 0.3 + smartRowH.reduce((a, b) => a + b, 0);
 
   // ③ 部署KPIへの貢献
   addSectionLabel(sl, y, '③ 部署KPIへの貢献（自分が担う数字）');

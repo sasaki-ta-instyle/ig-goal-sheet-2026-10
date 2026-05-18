@@ -1,6 +1,14 @@
 'use client';
 import { PersonalGoalData, SmartGoalRow, KpiContribRow, SlLevel } from '@/lib/types';
 
+const SMART_FIELDS: { key: 's' | 'm' | 'a' | 'r' | 't'; letter: string; label: string; placeholder: string }[] = [
+  { key: 's', letter: 'S', label: 'Specific（具体的）', placeholder: '何を達成するか、具体的に' },
+  { key: 'm', letter: 'M', label: 'Measurable（測定可能）', placeholder: '達成度を測る数値・指標' },
+  { key: 'a', letter: 'A', label: 'Achievable（達成可能）', placeholder: '現実的に到達可能な水準か' },
+  { key: 'r', letter: 'R', label: 'Relevant（関連性）', placeholder: '部署目標・自分の役割との関連' },
+  { key: 't', letter: 'T', label: 'Time-bound（期限）', placeholder: '〇月末・期中マイルストーンなど' },
+];
+
 const SL_OPTIONS: { value: SlLevel; title: string; desc: string }[] = [
   { value: 'S1', title: 'S1｜指示型', desc: '高指示・低支援。何を・いつまでに・どうやるかを具体的に指示してもらう段階。' },
   { value: 'S2', title: 'S2｜コーチ型', desc: '高指示・高支援。指示を受けつつ理由や背景も共有し、納得して進める段階。' },
@@ -96,27 +104,84 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
           SMARTの法則とは ↗
         </a>
       </p>
-      <div className="table-wrap" style={{ marginBottom: 24 }}>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>具体的目標（Specific）</th>
-              <th style={{ width: 110 }}>目標値</th>
-              <th style={{ width: 110 }}>期限</th>
-              <th>備考・関連目標</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.smartGoals.map((row, i) => (
-              <tr key={i}>
-                <td><TI value={row.goal} onChange={v => updateSmart(i, 'goal', v)} placeholder="具体的な目標" /></td>
-                <td><TI value={row.targetValue} onChange={v => updateSmart(i, 'targetValue', v)} placeholder="数値" /></td>
-                <td><TI value={row.deadline} onChange={v => updateSmart(i, 'deadline', v)} placeholder="〇月末" /></td>
-                <td><TI value={row.note} onChange={v => updateSmart(i, 'note', v)} placeholder="関連目標など" /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+        {data.smartGoals.map((row, i) => (
+          <div
+            key={i}
+            style={{
+              background: 'var(--glass-tinted)',
+              borderRadius: 'var(--r)',
+              padding: '16px 18px',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,.6)',
+            }}
+          >
+            <p
+              style={{
+                fontSize: '.75rem',
+                fontWeight: 600,
+                color: 'var(--color-text-muted)',
+                letterSpacing: '.04em',
+                marginBottom: 12,
+              }}
+            >
+              目標 {i + 1}
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {SMART_FIELDS.map(f => (
+                <div
+                  key={f.key}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '160px 1fr',
+                    alignItems: 'center',
+                    gap: 12,
+                  }}
+                >
+                  <label
+                    style={{
+                      fontSize: '.75rem',
+                      fontWeight: 600,
+                      color: 'var(--color-text)',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <span style={{ display: 'inline-block', width: 16, fontWeight: 700 }}>{f.letter}</span>
+                    <span style={{ color: 'var(--color-text-muted)', fontWeight: 500 }}>{f.label}</span>
+                  </label>
+                  <TI
+                    value={row[f.key]}
+                    onChange={v => updateSmart(i, f.key, v)}
+                    placeholder={f.placeholder}
+                  />
+                </div>
+              ))}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '160px 1fr',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginTop: 4,
+                }}
+              >
+                <label
+                  style={{
+                    fontSize: '.75rem',
+                    fontWeight: 500,
+                    color: 'var(--color-text-muted)',
+                  }}
+                >
+                  備考・関連目標
+                </label>
+                <TI
+                  value={row.note}
+                  onChange={v => updateSmart(i, 'note', v)}
+                  placeholder="関連目標・補足など"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 部署KPIへの貢献（自分が担う数字）</p>
