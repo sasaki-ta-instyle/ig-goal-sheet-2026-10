@@ -12,7 +12,7 @@ ConoHa VPS 上で本番運用する。本番反映は **「本番にあげて」
 |---|---|
 | CATEGORY | `app` |
 | APP_NAME | `instyle-goal-sheet-2026-10` |
-| PORT | `3007` |
+| PORT | `3008` |
 | 公開URL | `https://app.instyle.group/instyle-goal-sheet-2026-10/` |
 | HEALTHCHECK_PATH | `/instyle-goal-sheet-2026-10/`（ルート判定。`/api/health` は未実装） |
 | USE_DB | `false` |
@@ -64,15 +64,15 @@ pm2 reload app-instyle-goal-sheet-2026-10 --update-env
     ```nginx
     location = /instyle-goal-sheet-2026-10 {
       include snippets/proxy-next.conf;
-      proxy_pass http://127.0.0.1:3007;
+      proxy_pass http://127.0.0.1:3008;
     }
     location ^~ /instyle-goal-sheet-2026-10/ {
       include snippets/proxy-next.conf;
-      proxy_pass http://127.0.0.1:3007;
+      proxy_pass http://127.0.0.1:3008;
     }
     ```
   - `nginx -t && systemctl reload nginx`
 - ConoHa ポート台帳（`~/Workspace/docs/conoha-port-registry.md`）に下記 active 行を追加:
   ```
-  | active | app | instyle-goal-sheet-2026-10 | 3007 | app-instyle-goal-sheet-2026-10 | sasaki-ta-instyle/instyle-goal-sheet-2026-10 | https://app.instyle.group/instyle-goal-sheet-2026-10/ | /instyle-goal-sheet-2026-10/ | false | 2026-05-15 | 下期版（2026.10〜2027.3）。上期版 instyle-goal-sheet と並走 |
+  | active | app | instyle-goal-sheet-2026-10 | 3008 | app-instyle-goal-sheet-2026-10 | sasaki-ta-instyle/instyle-goal-sheet-2026-10 | https://app.instyle.group/instyle-goal-sheet-2026-10/ | /instyle-goal-sheet-2026-10/ | false | 2026-05-15 | 下期版（2026.10〜2027.3）。上期版 instyle-goal-sheet と並走 |
   ```
