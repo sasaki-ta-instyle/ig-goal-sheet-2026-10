@@ -9,7 +9,7 @@ import PersonalGoalForm from '@/components/forms/PersonalGoalForm';
 import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
-import { createDefaultFormData, CURRENT_PERIOD, FormData, SmartGoalRow } from '@/lib/types';
+import { createDefaultFormData, CURRENT_PERIOD, FormData, MarketValueRow, SmartGoalRow } from '@/lib/types';
 
 const STORAGE_KEY = 'instyle-goal-sheet-2026-10-v1';
 
@@ -38,6 +38,21 @@ function normalizeSmartGoals(input: unknown, defaults: SmartGoalRow[]): SmartGoa
   });
 }
 
+// 旧 JSON（marketValue 未定義）取り込み時のフォールバック。
+// 既存ラベル（会社／グループ／オーナー）の順序は保ち、不足は空、超過は切り捨て。
+function normalizeMarketValue(input: unknown, defaults: MarketValueRow[]): MarketValueRow[] {
+  if (!Array.isArray(input)) return defaults;
+  return defaults.map((def, i) => {
+    const raw = input[i] as Partial<MarketValueRow> | undefined;
+    if (!raw || typeof raw !== 'object') return def;
+    return {
+      label: raw.label ?? def.label,
+      amount: typeof raw.amount === 'string' ? raw.amount.replace(/[^\d]/g, '') : '',
+      rationale: raw.rationale ?? '',
+    };
+  });
+}
+
 // 旧バージョンの JSON / localStorage を読み込んだ場合に新フィールドが undefined になり
 // 下流のレンダリングや PPTX 生成が落ちるのを防ぐ正規化ヘルパ。
 // cover.period は常に当期に強制する（4月版エクスポートを 10月版にインポートしたケース対応）。
@@ -61,6 +76,7 @@ function mergeFormData(parsed: unknown): FormData {
       ...def.personal,
       ...(p.personal ?? {}),
       smartGoals: normalizeSmartGoals(p.personal?.smartGoals, def.personal.smartGoals),
+      marketValue: normalizeMarketValue(p.personal?.marketValue, def.personal.marketValue),
     },
     promotion: { ...def.promotion, ...(p.promotion ?? {}) },
     bonus: { ...def.bonus, ...(p.bonus ?? {}) },

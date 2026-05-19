@@ -1,6 +1,6 @@
 'use client';
 import { useLayoutEffect, useRef } from 'react';
-import { PersonalGoalData, SmartGoalRow, SlLevel } from '@/lib/types';
+import { PersonalGoalData, SmartGoalRow, SlLevel, MarketValueRow } from '@/lib/types';
 
 const SMART_FIELDS: { key: 's' | 'm' | 'a' | 'r' | 't'; letter: string; label: string; placeholder: string }[] = [
   { key: 's', letter: 'S', label: 'Specific（具体的）', placeholder: '何を達成するか、具体的に' },
@@ -80,6 +80,17 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
     const arr = data.smartGoals.map((r, idx) => idx === i ? { ...r, [field]: value } : r);
     set('smartGoals', arr);
   };
+  const updateMarket = (i: number, field: keyof MarketValueRow, value: string) => {
+    const arr = data.marketValue.map((r, idx) => idx === i ? { ...r, [field]: value } : r);
+    set('marketValue', arr);
+  };
+  const formatYen = (raw: string) => {
+    if (!raw) return '';
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return raw;
+    return n.toLocaleString('ja-JP');
+  };
+  const parseYen = (v: string) => v.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/[^\d]/g, '');
   return (
     <div>
       <p className="section-title">04｜個人目標 記入シート</p>
@@ -318,11 +329,57 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
         onChange={e => set('slNote', e.target.value)}
       />
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>④ 上長からの一言</p>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 6 }}>④ 自分の市場価値（自己見積もり）</p>
+      <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+        所属会社／グループ／オーナー、それぞれから見て、今期の自分はいくらで<strong>「求められる」</strong>人材か。報酬は<strong>生み出した価値に従って獲得する</strong>もの。希望年収ではなく、提供している（提供できる）価値に対する自己見積もりとして記入してください。
+      </p>
+      <div className="table-wrap" style={{ marginBottom: 24 }}>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th style={{ width: '20%' }}>買い手</th>
+              <th style={{ width: '22%' }}>自己見積もり年収</th>
+              <th>その値段の根拠（顧客・貢献・需要の中身）</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.marketValue.map((row, i) => (
+              <tr key={i}>
+                <td style={{ fontWeight: 500, fontSize: '.8125rem' }}>{row.label}</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)' }}>¥</span>
+                    <input
+                      className="input"
+                      style={{ padding: '6px 8px', fontSize: '.8125rem', textAlign: 'right', flex: 1 }}
+                      inputMode="numeric"
+                      value={formatYen(row.amount)}
+                      onChange={e => updateMarket(i, 'amount', parseYen(e.target.value))}
+                      placeholder="0"
+                    />
+                    <span style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>円 / 年</span>
+                  </div>
+                </td>
+                <td>
+                  <textarea
+                    className="input"
+                    style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 60, width: '100%', resize: 'vertical' }}
+                    value={row.rationale}
+                    onChange={e => updateMarket(i, 'rationale', e.target.value)}
+                    placeholder="どんな顧客に、どんな貢献をしていて、どこから需要があるか"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>⑤ 上長からの一言</p>
       <textarea
         className="input"
         style={{ width: '100%', minHeight: 96, resize: 'vertical', padding: '8px 10px', fontSize: '.8125rem' }}
-        placeholder="上長が記入。期初の期待・SL の合意・コメントなど"
+        placeholder="上長が記入。期初の期待・SL の合意・自己見積もりへの所感・コメントなど"
         value={data.supervisorComment}
         onChange={e => set('supervisorComment', e.target.value)}
       />
