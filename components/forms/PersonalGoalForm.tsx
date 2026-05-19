@@ -331,7 +331,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 6 }}>④ 自分の市場価値（自己見積もり）</p>
       <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
-        所属会社／グループ／オーナー、それぞれから見て、今期の自分はいくらで<strong>「求められる」</strong>人材か。報酬は<strong>生み出した価値に従って獲得する</strong>もの。希望年収ではなく、提供している（提供できる）価値に対する自己見積もりとして記入してください。
+        所属会社／グループ／西村さん、それぞれから見て、今期の自分はいくらで<strong>「求められる」</strong>人材か。報酬は<strong>生み出した価値に従って獲得する</strong>もの。希望年収ではなく、提供している（提供できる）価値に対する自己見積もりとして記入してください。
       </p>
       <div className="table-wrap" style={{ marginBottom: 24 }}>
         <table className="data-table">

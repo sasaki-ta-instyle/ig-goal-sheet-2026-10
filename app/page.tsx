@@ -39,14 +39,15 @@ function normalizeSmartGoals(input: unknown, defaults: SmartGoalRow[]): SmartGoa
 }
 
 // 旧 JSON（marketValue 未定義）取り込み時のフォールバック。
-// 既存ラベル（会社／グループ／オーナー）の順序は保ち、不足は空、超過は切り捨て。
+// ラベル（会社／グループ／西村さん）は固定で、ユーザーの入力データから上書きしない。
+// 行の順序を保ったまま amount / rationale だけ引き継ぐ。
 function normalizeMarketValue(input: unknown, defaults: MarketValueRow[]): MarketValueRow[] {
   if (!Array.isArray(input)) return defaults;
   return defaults.map((def, i) => {
     const raw = input[i] as Partial<MarketValueRow> | undefined;
     if (!raw || typeof raw !== 'object') return def;
     return {
-      label: raw.label ?? def.label,
+      label: def.label,
       amount: typeof raw.amount === 'string' ? raw.amount.replace(/[^\d]/g, '') : '',
       rationale: raw.rationale ?? '',
     };

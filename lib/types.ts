@@ -238,7 +238,7 @@ export function createDefaultFormData(): FormData {
       marketValue: [
         { label: '会社', amount: '', rationale: '' },
         { label: 'グループ', amount: '', rationale: '' },
-        { label: 'オーナー', amount: '', rationale: '' },
+        { label: '西村さん', amount: '', rationale: '' },
       ],
       supervisorComment: '',
     },
