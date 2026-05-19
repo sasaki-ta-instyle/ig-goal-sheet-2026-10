@@ -1,5 +1,6 @@
 'use client';
-import { PersonalGoalData, SmartGoalRow, KpiContribRow, SlLevel } from '@/lib/types';
+import { useLayoutEffect, useRef } from 'react';
+import { PersonalGoalData, SmartGoalRow, SlLevel } from '@/lib/types';
 
 const SMART_FIELDS: { key: 's' | 'm' | 'a' | 'r' | 't'; letter: string; label: string; placeholder: string }[] = [
   { key: 's', letter: 'S', label: 'Specific（具体的）', placeholder: '何を達成するか、具体的に' },
@@ -38,6 +39,35 @@ function TI({ value, onChange, placeholder, numeric }: { value: string; onChange
   );
 }
 
+function TA({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [value]);
+  return (
+    <textarea
+      ref={ref}
+      className="input"
+      rows={1}
+      style={{
+        padding: '6px 8px',
+        fontSize: '.8125rem',
+        lineHeight: 1.5,
+        resize: 'none',
+        overflow: 'hidden',
+        width: '100%',
+        fontFamily: 'inherit',
+      }}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder ?? '—'}
+    />
+  );
+}
+
 export default function PersonalGoalForm({ data, onChange }: Props) {
   const set = <K extends keyof PersonalGoalData>(key: K, value: PersonalGoalData[K]) =>
     onChange({ ...data, [key]: value });
@@ -50,11 +80,6 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
     const arr = data.smartGoals.map((r, idx) => idx === i ? { ...r, [field]: value } : r);
     set('smartGoals', arr);
   };
-  const updateKpi = (i: number, field: keyof KpiContribRow, value: string) => {
-    const arr = data.kpiContribs.map((r, idx) => idx === i ? { ...r, [field]: value } : r);
-    set('kpiContribs', arr);
-  };
-
   return (
     <div>
       <p className="section-title">04｜個人目標 記入シート</p>
@@ -127,13 +152,38 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
               目標 {i + 1}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '160px 1fr',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginBottom: 4,
+                }}
+              >
+                <label
+                  style={{
+                    fontSize: '.75rem',
+                    fontWeight: 600,
+                    color: 'var(--color-text)',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  該当する部署KPI
+                </label>
+                <TI
+                  value={row.relatedKpi || ''}
+                  onChange={v => updateSmart(i, 'relatedKpi', v)}
+                  placeholder="該当する部署KPIがある場合に記入"
+                />
+              </div>
               {SMART_FIELDS.map(f => (
                 <div
                   key={f.key}
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '160px 1fr',
-                    alignItems: 'center',
+                    alignItems: 'start',
                     gap: 12,
                   }}
                 >
@@ -143,12 +193,13 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
                       fontWeight: 600,
                       color: 'var(--color-text)',
                       lineHeight: 1.4,
+                      paddingTop: 6,
                     }}
                   >
                     <span style={{ display: 'inline-block', width: 16, fontWeight: 700 }}>{f.letter}</span>
                     <span style={{ color: 'var(--color-text-muted)', fontWeight: 500 }}>{f.label}</span>
                   </label>
-                  <TI
+                  <TA
                     value={row[f.key]}
                     onChange={v => updateSmart(i, f.key, v)}
                     placeholder={f.placeholder}
@@ -159,7 +210,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '160px 1fr',
-                  alignItems: 'center',
+                  alignItems: 'start',
                   gap: 12,
                   marginTop: 4,
                 }}
@@ -169,14 +220,15 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
                     fontSize: '.75rem',
                     fontWeight: 500,
                     color: 'var(--color-text-muted)',
+                    paddingTop: 6,
                   }}
                 >
-                  備考・関連目標
+                  備考・補足など
                 </label>
-                <TI
+                <TA
                   value={row.note}
                   onChange={v => updateSmart(i, 'note', v)}
-                  placeholder="関連目標・補足など"
+                  placeholder="備考・補足など"
                 />
               </div>
             </div>
@@ -184,28 +236,8 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
         ))}
       </div>
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 部署KPIへの貢献（自分が担う数字）</p>
-      <div className="table-wrap" style={{ marginBottom: 24 }}>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>部署KPI</th>
-              <th>自分の担当分</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.kpiContribs.map((row, i) => (
-              <tr key={i}>
-                <td><TI value={row.deptKpi} onChange={v => updateKpi(i, 'deptKpi', v)} placeholder="部署KPI名" /></td>
-                <td><TI value={row.myPart} onChange={v => updateKpi(i, 'myPart', v)} placeholder="自分の担当分" /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 6, display: 'flex', alignItems: 'baseline', gap: 12 }}>
-        <span>④ SL理論</span>
+        <span>③ SL理論</span>
         <a
           href="https://www.dodadsj.com/content/20230224_sl-theory/"
           target="_blank"
@@ -286,7 +318,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
         onChange={e => set('slNote', e.target.value)}
       />
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>⑤ 上長からの一言</p>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>④ 上長からの一言</p>
       <textarea
         className="input"
         style={{ width: '100%', minHeight: 96, resize: 'vertical', padding: '8px 10px', fontSize: '.8125rem' }}

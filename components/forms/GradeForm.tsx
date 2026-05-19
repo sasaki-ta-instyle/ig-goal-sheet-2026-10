@@ -37,7 +37,14 @@ export default function GradeForm({ selectedGrade, expectations, onChange }: Pro
       )}
 
       <div className="table-wrap">
-        <table className="data-table" style={{ fontSize: '.875rem' }}>
+        <table className="data-table" style={{ fontSize: '.875rem', tableLayout: 'fixed', width: '100%' }}>
+          <colgroup>
+            <col style={{ width: 48 }} />
+            <col style={{ width: 110 }} />
+            <col style={{ width: 80 }} />
+            <col style={{ width: 130 }} />
+            <col />
+          </colgroup>
           <thead>
             <tr>
               <th></th>

@@ -27,6 +27,7 @@ function normalizeSmartGoals(input: unknown, defaults: SmartGoalRow[]): SmartGoa
     const raw = input[i] as LegacySmartGoalRow | undefined;
     if (!raw || typeof raw !== 'object') return def;
     return {
+      relatedKpi: (raw as { relatedKpi?: string }).relatedKpi ?? '',
       s: raw.s ?? raw.goal ?? '',
       m: raw.m ?? raw.targetValue ?? '',
       a: raw.a ?? '',
@@ -244,7 +245,7 @@ export default function Home() {
           <div className="glass-panel" style={{ marginBottom: 24 }}>
             {step === 1 && <CoverForm data={formData.cover} onChange={updateCover} />}
             {step === 2 && <CompanyGoalForm data={formData.group} onChange={updateGroup} title="01｜グループ目標 記入シート" labelPrefix="グループ" />}
-            {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" />}
+            {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" parentStrategicFocus={formData.group.strategicFocus} parentLabelPrefix="グループ" />}
             {step === 4 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
             {step === 5 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
             {step === 6 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}

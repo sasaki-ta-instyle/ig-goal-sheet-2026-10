@@ -59,6 +59,7 @@ export interface CurrentStatusRow {
 }
 
 export interface SmartGoalRow {
+  relatedKpi: string;
   s: string;
   m: string;
   a: string;
@@ -223,7 +224,7 @@ export function createDefaultFormData(): FormData {
         { label: 'それを受けてどう行動したか', value: '' },
         { label: '今期の役割・期待（自己認識）', value: '' },
       ],
-      smartGoals: Array(3).fill(null).map(() => ({ s: '', m: '', a: '', r: '', t: '', note: '' })),
+      smartGoals: Array(3).fill(null).map(() => ({ relatedKpi: '', s: '', m: '', a: '', r: '', t: '', note: '' })),
       kpiContribs: Array(3).fill(null).map(() => ({ deptKpi: '', myPart: '' })),
       slLevel: '',
       slNote: '',

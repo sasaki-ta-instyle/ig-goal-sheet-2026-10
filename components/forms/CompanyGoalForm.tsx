@@ -6,6 +6,8 @@ interface Props {
   onChange: (data: CompanyGoalData) => void;
   title?: string;
   labelPrefix?: string;
+  parentStrategicFocus?: string;
+  parentLabelPrefix?: string;
 }
 
 const toNumeric = (v: string) => {
@@ -74,7 +76,15 @@ function KpiNumTable({
 }) {
   return (
     <div className="table-wrap" style={{ marginBottom: 24 }}>
-      <table className="data-table">
+      <table className="data-table" style={{ tableLayout: 'fixed', width: '100%' }}>
+        <colgroup>
+          <col style={{ width: 130 }} />
+          <col style={{ width: 110 }} />
+          <col style={{ width: 110 }} />
+          <col style={{ width: 110 }} />
+          <col style={{ width: 70 }} />
+          <col />
+        </colgroup>
         <thead>
           <tr>
             <th>指標</th>
@@ -128,7 +138,10 @@ export default function CompanyGoalForm({
   onChange,
   title = '02｜会社目標 記入シート',
   labelPrefix = '会社',
+  parentStrategicFocus,
+  parentLabelPrefix,
 }: Props) {
+  const hasParent = parentStrategicFocus !== undefined;
   const set = <K extends keyof CompanyGoalData>(key: K, value: CompanyGoalData[K]) =>
     onChange({ ...data, [key]: value });
 
@@ -173,13 +186,45 @@ export default function CompanyGoalForm({
       <p className="section-title">{title}</p>
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>① 戦略的フォーカス</p>
-      <textarea
-        className="input"
-        style={{ width: '100%', minHeight: 80, resize: 'vertical', padding: '6px 8px', fontSize: '.8125rem', marginBottom: 24 }}
-        placeholder="今期の戦略的フォーカスを記入"
-        value={data.strategicFocus}
-        onChange={e => set('strategicFocus', e.target.value)}
-      />
+      {hasParent ? (
+        <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+          <div>
+            <label className="form-label">戦略的フォーカス（{parentLabelPrefix ?? 'グループ'}）<span style={{ marginLeft: 6, fontWeight: 400, fontSize: '.7rem', color: 'var(--color-text-muted)' }}>自動転記</span></label>
+            <div
+              className="input"
+              style={{
+                minHeight: 80,
+                padding: '8px 10px',
+                fontSize: '.8125rem',
+                background: 'var(--glass-tinted)',
+                color: parentStrategicFocus ? 'var(--color-text-muted)' : 'var(--color-text-light)',
+                whiteSpace: 'pre-wrap',
+                cursor: 'default',
+              }}
+            >
+              {parentStrategicFocus || `${parentLabelPrefix ?? 'グループ'}目標シートで「戦略的フォーカス」を入力すると、ここに自動で表示されます。`}
+            </div>
+          </div>
+          <div>
+            <label className="form-label">戦略的フォーカス（{labelPrefix}）</label>
+            <textarea
+              className="input"
+              style={{ width: '100%', minHeight: 80, resize: 'vertical', padding: '6px 8px', fontSize: '.8125rem' }}
+              placeholder={`${labelPrefix}としての今期の戦略的フォーカスを記入`}
+              value={data.strategicFocus}
+              onChange={e => set('strategicFocus', e.target.value)}
+            />
+          </div>
+        </div>
+      ) : (
+        <textarea
+          className="input"
+          style={{ width: '100%', minHeight: 80, resize: 'vertical', padding: '6px 8px', fontSize: '.8125rem', marginBottom: 24 }}
+          placeholder="今期の戦略的フォーカスを記入"
+          value={data.strategicFocus}
+          onChange={e => set('strategicFocus', e.target.value)}
+        />
+      )}
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>② 売上</p>
       <KpiNumTable

@@ -1,4 +1,5 @@
 'use client';
+import { Fragment } from 'react';
 import { DeptGoalData, DeptKpiNumRow, DeptKgiRow, DeptActionRow } from '@/lib/types';
 
 interface Props {
@@ -158,44 +159,57 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
                 </th>
               ))}
               <th>成長率（％）</th>
-              <th>来期目標</th>
             </tr>
           </thead>
           <tbody>
             {kpiItems.map(item => (
-              <tr key={item.key}>
-                <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.label}</td>
-                <td>
-                  <TI
-                    value={data[item.key].label}
-                    onChange={v => updateKpi(item.key, 'label', v)}
-                    placeholder="指標名"
-                  />
-                </td>
-                {KPI_COLS.map(c => (
-                  <td key={c.key}>
+              <Fragment key={item.key}>
+                <tr>
+                  <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.label}</td>
+                  <td>
                     <TI
-                      value={data[item.key][c.key]}
-                      onChange={v => updateKpi(item.key, c.key, v)}
-                      placeholder="数字または自由記入"
-                      autoNumber={c.autoNumber}
-                      compact
+                      value={data[item.key].label}
+                      onChange={v => updateKpi(item.key, 'label', v)}
+                      placeholder="指標名"
                     />
                   </td>
-                ))}
-                <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-                  {calcGrowth(data[item.key].prev, data[item.key].actual)}
-                </td>
-                <td>
-                  <textarea
-                    className="input"
-                    style={{ padding: '6px 8px', fontSize: '.8125rem', minHeight: 72, resize: 'vertical' }}
-                    value={data[item.key].nextTarget}
-                    onChange={e => updateKpi(item.key, 'nextTarget', e.target.value)}
-                    placeholder="自由記入"
-                  />
-                </td>
-              </tr>
+                  {KPI_COLS.map(c => (
+                    <td key={c.key}>
+                      <TI
+                        value={data[item.key][c.key]}
+                        onChange={v => updateKpi(item.key, c.key, v)}
+                        placeholder="数字または自由記入"
+                        autoNumber={c.autoNumber}
+                        compact
+                      />
+                    </td>
+                  ))}
+                  <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+                    {calcGrowth(data[item.key].prev, data[item.key].actual)}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{
+                    color: 'var(--color-text-muted)',
+                    fontWeight: 600,
+                    fontSize: '.6875rem',
+                    letterSpacing: '.07em',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    verticalAlign: 'top',
+                    paddingTop: 12,
+                  }}>来期目標</td>
+                  <td colSpan={KPI_COLS.length + 2}>
+                    <textarea
+                      className="input"
+                      style={{ padding: '6px 8px', fontSize: '.8125rem', lineHeight: 1.5, fontFamily: 'inherit', minHeight: 52, resize: 'vertical', width: '100%' }}
+                      value={data[item.key].nextTarget}
+                      onChange={e => updateKpi(item.key, 'nextTarget', e.target.value)}
+                      placeholder="来期目標を自由記入"
+                    />
+                  </td>
+                </tr>
+              </Fragment>
             ))}
           </tbody>
         </table>

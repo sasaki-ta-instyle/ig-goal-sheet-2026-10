@@ -266,38 +266,116 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   addSectionLabel(sl, y, '② SMART個人目標');
   y += 0.3;
   const SMART_LABELS: { key: 's' | 'm' | 'a' | 'r' | 't'; label: string }[] = [
-    { key: 's', label: 'S' },
-    { key: 'm', label: 'M' },
-    { key: 'a', label: 'A' },
-    { key: 'r', label: 'R' },
-    { key: 't', label: 'T' },
+    { key: 's', label: 'S＝Specific（具体的）' },
+    { key: 'm', label: 'M＝Measurable（測定可能）' },
+    { key: 'a', label: 'A＝Achievable（達成可能）' },
+    { key: 'r', label: 'R＝Relevant（関連性）' },
+    { key: 't', label: 'T＝Time-bound（期限）' },
   ];
-  const smartRows = c.smartGoals.map((r) => {
-    const lines = SMART_LABELS
-      .map(({ key, label }) => ({ label, value: r[key] }))
-      .filter(({ value }) => value && value.trim() !== '')
-      .map(({ label, value }) => `${label}: ${value}`);
-    const goalCell = lines.length > 0 ? lines.join('\n') : '—';
-    return [goalCell, r.note || '—'];
-  });
-  const smartRowH = smartRows.map(([cell]) => {
-    const lineCount = cell === '—' ? 1 : cell.split('\n').length;
-    return Math.max(0.32, 0.22 + lineCount * 0.18);
-  });
-  addTable(sl, y, ['SMART個人目標（S/M/A/R/T）', '備考・関連目標'], smartRows,
-    [7.6, 2.4], smartRowH);
-  y += 0.3 + smartRowH.reduce((a, b) => a + b, 0);
+  const smartColWidths = [2.6, 5.0, 2.4];
+  const smartTotalW = smartColWidths.reduce((a, b) => a + b, 0);
+  const smartActualWidths = smartColWidths.map(w => (w / smartTotalW) * (W - 0.8));
+  const smartRowHeight = 0.30;
+  const smartHeaderH = 0.28;
 
-  // ③ 部署KPIへの貢献
-  addSectionLabel(sl, y, '③ 部署KPIへの貢献（自分が担う数字）');
-  y += 0.3;
-  const kpiRows = c.kpiContribs.map(r => [r.deptKpi || '—', r.myPart || '—']);
-  addTable(sl, y, ['部署KPI', '自分の担当分'], kpiRows, [6.0, W - 0.8 - 6.0]);
-  y += 0.3 + kpiRows.length * 0.3 + 0.15;
+  const smartTableData: pptxgen.TableRow[] = [];
+  smartTableData.push(['項目', '内容', '備考・補足など'].map(h => ({
+    text: h,
+    options: {
+      bold: true, fontSize: 7, fontFace: FONT,
+      color: C.muted,
+      fill: { color: C.header },
+      align: 'left' as const,
+      border: ROW_BORDER,
+    },
+  })));
 
-  // ④ SL理論
-  addSectionLabel(sl, y, '④ SL理論（上長と合意した今期の関わり方）');
+  const rowsPerGoal = SMART_LABELS.length + 1;
+  c.smartGoals.forEach((goal, gi) => {
+    const fillColor = gi % 2 === 0 ? C.surface : C.surface2;
+
+    // 1行目: 該当する部署KPI
+    smartTableData.push([
+      {
+        text: '該当する部署KPI',
+        options: {
+          bold: true, fontSize: 8, fontFace: FONT,
+          color: C.muted,
+          fill: { color: fillColor },
+          align: 'left' as const,
+          border: ROW_BORDER,
+        },
+      },
+      {
+        text: goal.relatedKpi && goal.relatedKpi.trim() !== '' ? goal.relatedKpi : '—',
+        options: {
+          fontSize: 8, fontFace: FONT,
+          color: C.text,
+          fill: { color: fillColor },
+          align: 'left' as const,
+          border: ROW_BORDER,
+        },
+      },
+      {
+        text: goal.note || '—',
+        options: {
+          fontSize: 8, fontFace: FONT,
+          color: C.text,
+          fill: { color: fillColor },
+          align: 'left' as const,
+          border: ROW_BORDER,
+          rowspan: rowsPerGoal,
+          valign: 'top' as const,
+        },
+      },
+    ]);
+
+    // 続いて SMART 5 行
+    SMART_LABELS.forEach(({ key, label }) => {
+      const value = goal[key];
+      smartTableData.push([
+        {
+          text: label,
+          options: {
+            bold: true, fontSize: 8, fontFace: FONT,
+            color: C.muted,
+            fill: { color: fillColor },
+            align: 'left' as const,
+            border: ROW_BORDER,
+          },
+        },
+        {
+          text: value && value.trim() !== '' ? value : '—',
+          options: {
+            fontSize: 8, fontFace: FONT,
+            color: C.text,
+            fill: { color: fillColor },
+            align: 'left' as const,
+            border: ROW_BORDER,
+          },
+        },
+      ]);
+    });
+  });
+
+  const smartTotalRows = c.smartGoals.length * rowsPerGoal;
+  sl.addTable(smartTableData, {
+    x: 0.4, y,
+    w: W - 0.8,
+    colW: smartActualWidths,
+    rowH: [smartHeaderH, ...Array(smartTotalRows).fill(smartRowHeight)],
+    autoPage: false,
+  });
+  y += 0.3 + smartHeaderH + smartTotalRows * smartRowHeight;
+
+  // ③ SL理論
+  addSectionLabel(sl, y, '③ SL理論（上長と合意した今期の関わり方）');
   y += 0.3;
+  sl.addText('上長と握った内容', {
+    x: 0.4, y, w: W - 0.8, h: 0.22,
+    fontFace: FONT, fontSize: 7, color: C.muted, bold: true,
+  });
+  y += 0.24;
   const SL_LABELS: Record<string, string> = {
     S1: 'S1｜指示型（高指示・低支援）',
     S2: 'S2｜コーチ型（高指示・高支援）',
@@ -310,8 +388,8 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   textBox(sl, 0.4 + slBoxW + 0.16, y, W - 0.8 - slBoxW - 0.16, 0.4, c.slNote || '（上長との合意メモ未記入）');
   y += 0.55;
 
-  // ⑤ 上長からの一言
-  addSectionLabel(sl, y, '⑤ 上長からの一言');
+  // ④ 上長からの一言
+  addSectionLabel(sl, y, '④ 上長からの一言');
   y += 0.3;
   textBox(sl, 0.4, y, W - 0.8, 0.6, c.supervisorComment || '—');
 }
