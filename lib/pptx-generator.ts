@@ -392,14 +392,14 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   addSectionLabel(sl, y, '④ 自分の市場価値（自己見積もり）');
   y += 0.3;
   const ITEM_INDEX = ['①', '②', '③', '④', '⑤'];
-  const mvColWidths = [0.5, 1.8, W - 0.8 - 0.5 - 1.8 - 2.0, 2.0];
+  const mvColWidths = [0.5, W - 0.8 - 0.5 - 2.0, 2.0];
   const mvRows = c.marketValue.map((r, i) => {
     const amount = r.amount && r.amount.trim() !== ''
       ? `¥ ${Number(r.amount).toLocaleString('ja-JP')} / 年`
       : '—';
-    return [ITEM_INDEX[i] ?? `${i + 1}.`, r.label || '—', r.rationale || '—', amount];
+    return [ITEM_INDEX[i] ?? `${i + 1}.`, r.rationale || '—', amount];
   });
-  addTable(sl, y, ['No.', '項目', '根拠（顧客・貢献・需要の中身）', '金額'],
+  addTable(sl, y, ['No.', '項目・概要', '金額'],
     mvRows, mvColWidths);
   y += 0.3 + mvRows.length * 0.38;
   const mvTotal = c.marketValue.reduce(

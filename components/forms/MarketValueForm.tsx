@@ -40,15 +40,13 @@ export default function MarketValueForm({ data, onChange }: Props) {
         <table className="data-table">
           <colgroup>
             <col style={{ width: '5%' }} />
-            <col style={{ width: '18%' }} />
             <col />
             <col style={{ width: '22%' }} />
           </colgroup>
           <thead>
             <tr>
               <th style={{ textAlign: 'center' }}>No.</th>
-              <th>項目</th>
-              <th>根拠（顧客・貢献・需要の中身）</th>
+              <th>項目・概要</th>
               <th style={{ textAlign: 'right' }}>金額</th>
             </tr>
           </thead>
@@ -59,21 +57,12 @@ export default function MarketValueForm({ data, onChange }: Props) {
                   {ITEM_INDEX[i] ?? `${i + 1}.`}
                 </td>
                 <td>
-                  <input
-                    className="input"
-                    style={{ padding: '6px 8px', fontSize: '.8125rem', width: '100%' }}
-                    value={row.label}
-                    onChange={e => updateMarket(i, 'label', e.target.value)}
-                    placeholder="例：顧客への貢献"
-                  />
-                </td>
-                <td>
                   <textarea
                     className="input"
-                    style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 60, width: '100%', resize: 'vertical' }}
+                    style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 72, width: '100%', resize: 'vertical', lineHeight: 1.6 }}
                     value={row.rationale}
                     onChange={e => updateMarket(i, 'rationale', e.target.value)}
-                    placeholder="どんな顧客に、どんな貢献をしていて、どこから需要があるか"
+                    placeholder="項目名と、その値段の根拠（どんな顧客に、どんな貢献をしていて、どこから需要があるか）"
                   />
                 </td>
                 <td>
@@ -95,7 +84,7 @@ export default function MarketValueForm({ data, onChange }: Props) {
           <tfoot>
             <tr>
               <td
-                colSpan={3}
+                colSpan={2}
                 style={{
                   textAlign: 'right',
                   fontWeight: 600,
