@@ -195,7 +195,7 @@ function slide3(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
-  addSlideHeader(sl, '03｜部署目標 記入シート', 'INSTYLE GROUP｜人事制度　4 / 8');
+  addSlideHeader(sl, '03｜部署目標 記入シート', 'INSTYLE GROUP｜人事制度　4 / 9');
 
   const c = d.dept;
   let y = 1.05;
@@ -250,7 +250,7 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
-  addSlideHeader(sl, '04｜個人目標 記入シート', 'INSTYLE GROUP｜人事制度　5 / 8');
+  addSlideHeader(sl, '04｜個人目標 記入シート', 'INSTYLE GROUP｜人事制度　5 / 9');
 
   const c = d.personal;
   let y = 1.05;
@@ -388,9 +388,29 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   textBox(sl, 0.4 + slBoxW + 0.16, y, W - 0.8 - slBoxW - 0.16, 0.4, c.slNote || '（上長との合意メモ未記入）');
   y += 0.55;
 
-  // ④ 自分の市場価値（自己見積もり） — 見積書スタイル（3 明細 + 合計）
-  addSectionLabel(sl, y, '④ 自分の市場価値（自己見積もり）');
+  // ④ 上長からの一言
+  addSectionLabel(sl, y, '④ 上長からの一言');
   y += 0.3;
+  textBox(sl, 0.4, y, W - 0.8, 0.6, c.supervisorComment || '—');
+}
+
+// スライド5: 自己見積もり（個人目標とグレードの間。アプリでも独立ステップ）
+function slideMarketValue(prs: InstanceType<typeof pptxgen>, d: FormData) {
+  const sl = prs.addSlide();
+  sl.background = { color: C.bg };
+
+  addSlideHeader(sl, '05｜自己見積もり 記入シート', 'INSTYLE GROUP｜人事制度　6 / 9');
+
+  const c = d.personal;
+  let y = 1.05;
+
+  addSectionLabel(sl, y, '自分の市場価値（自己見積もり）');
+  y += 0.3;
+  textBox(sl, 0.4, y, W - 0.8, 0.7,
+    '今期の自分はいくらで「求められる」人材か。報酬は生み出した価値に従って獲得するもの。希望年収ではなく、提供している（提供できる）価値の根拠を 3 つ挙げ、見積書のように内訳と金額を書き出した内容。下に合計を表示する。',
+    { fontSize: 8, color: C.muted, fill: { color: C.bg } });
+  y += 0.78;
+
   const ITEM_INDEX = ['①', '②', '③', '④', '⑤'];
   const mvColWidths = [0.5, W - 0.8 - 0.5 - 2.0, 2.0];
   const mvRows = c.marketValue.map((r, i) => {
@@ -399,22 +419,16 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
       : '—';
     return [ITEM_INDEX[i] ?? `${i + 1}.`, r.rationale || '—', amount];
   });
-  addTable(sl, y, ['No.', '項目・概要', '金額'],
-    mvRows, mvColWidths);
+  addTable(sl, y, ['No.', '項目・概要', '金額'], mvRows, mvColWidths);
   y += 0.3 + mvRows.length * 0.38;
+
   const mvTotal = c.marketValue.reduce(
     (s, r) => s + (parseInt((r.amount || '').replace(/[^\d]/g, ''), 10) || 0),
     0,
   );
-  textBox(sl, 0.4, y, W - 0.8, 0.32,
+  textBox(sl, 0.4, y, W - 0.8, 0.36,
     `合計   ¥ ${mvTotal.toLocaleString('ja-JP')} 円 / 年`,
-    { bold: true, fontSize: 9, align: 'right', fill: { color: C.surface2 } });
-  y += 0.4;
-
-  // ⑤ 上長からの一言
-  addSectionLabel(sl, y, '⑤ 上長からの一言');
-  y += 0.3;
-  textBox(sl, 0.4, y, W - 0.8, 0.6, c.supervisorComment || '—');
+    { bold: true, fontSize: 10, align: 'right', fill: { color: C.surface2 } });
 }
 
 // スライド5: グレード表
@@ -422,7 +436,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
-  addSlideHeader(sl, '05｜グレード表', 'INSTYLE GROUP｜人事制度　6 / 8');
+  addSlideHeader(sl, '06｜グレード表', 'INSTYLE GROUP｜人事制度　7 / 9');
 
   const x0 = 0.4;
   const y = 1.1;
@@ -542,7 +556,7 @@ function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
-  addSlideHeader(sl, '06｜昇格・昇給 採点シート', 'INSTYLE GROUP｜人事制度　7 / 8');
+  addSlideHeader(sl, '07｜昇格・昇給 採点シート', 'INSTYLE GROUP｜人事制度　8 / 9');
 
   const p = d.promotion;
   let y = 1.05;
@@ -623,7 +637,7 @@ function slide7(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
-  addSlideHeader(sl, '07｜ボーナス評価 採点シート', 'INSTYLE GROUP｜人事制度　8 / 8');
+  addSlideHeader(sl, '08｜ボーナス評価 採点シート', 'INSTYLE GROUP｜人事制度　9 / 9');
 
   const b = d.bonus;
   let y = 1.05;
@@ -689,10 +703,11 @@ export async function generatePptx(data: FormData) {
   prs.subject = '目標設定シート';
 
   slide1(prs, data);
-  slideGoal(prs, data.group, '01｜グループ目標 記入シート', 'INSTYLE GROUP｜人事制度　2 / 8', 'グループ');
-  slideGoal(prs, data.company, '02｜会社目標 記入シート', 'INSTYLE GROUP｜人事制度　3 / 8', '会社');
+  slideGoal(prs, data.group, '01｜グループ目標 記入シート', 'INSTYLE GROUP｜人事制度　2 / 9', 'グループ');
+  slideGoal(prs, data.company, '02｜会社目標 記入シート', 'INSTYLE GROUP｜人事制度　3 / 9', '会社');
   slide3(prs, data);
   slide4(prs, data);
+  slideMarketValue(prs, data);
   slide5(prs, data.cover.grade, data.gradeExpectations as Record<string, string>);
   slide6(prs, data);
   slide7(prs, data);
