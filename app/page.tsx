@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import StepIndicator from '@/components/StepIndicator';
+import GoalFunnel from '@/components/GoalFunnel';
 import CoverForm from '@/components/forms/CoverForm';
 import CompanyGoalForm from '@/components/forms/CompanyGoalForm';
 import DeptGoalForm from '@/components/forms/DeptGoalForm';
@@ -86,6 +87,11 @@ function mergeFormData(parsed: unknown): FormData {
     bonus: { ...def.bonus, ...(p.bonus ?? {}) },
     gradeExpectations: { ...def.gradeExpectations, ...(p.gradeExpectations ?? {}) },
   };
+}
+
+// 目標カスケードのサイドバーを出すステップ範囲（グループ〜自己見積もり）
+function showFunnel(step: number): boolean {
+  return step >= 2 && step <= 6;
 }
 
 export default function Home() {
@@ -259,64 +265,81 @@ export default function Home() {
         <StepIndicator current={step} onNavigate={navigate} />
 
         {/* Main content */}
-        <main className="site-main" style={{ maxWidth: 1080, margin: '0 auto', padding: '0 24px 80px' }}>
+        <main className="site-main" style={{ maxWidth: showFunnel(step) ? 1340 : 1080, margin: '0 auto', padding: '0 24px 80px' }}>
 
-          {/* Form card */}
-          <div className="glass-panel" style={{ marginBottom: 24 }}>
-            {step === 1 && <CoverForm data={formData.cover} onChange={updateCover} />}
-            {step === 2 && <CompanyGoalForm data={formData.group} onChange={updateGroup} title="01｜グループ目標 記入シート" labelPrefix="グループ" />}
-            {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" parentStrategicFocus={formData.group.strategicFocus} parentLabelPrefix="グループ" />}
-            {step === 4 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
-            {step === 5 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
-            {step === 6 && <MarketValueForm data={formData.personal} onChange={updatePersonal} />}
-            {step === 7 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
-            {step === 8 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
-            {step === 9 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
-            {step === 10 && <ConfirmView data={formData} />}
-          </div>
-
-          {/* Navigation buttons */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button
-              className="btn btn-secondary"
-              onClick={() => navigate(step - 1)}
-              disabled={step === 1}
-            >
-              ← 前へ
-            </button>
-
-            {step < 10 ? (
-              <button
-                className="btn btn-primary"
-                onClick={() => navigate(step + 1)}
-              >
-                次へ →
-              </button>
-            ) : (
-              <button
-                className="btn btn-primary btn-lg"
-                onClick={handleDownload}
-                disabled={isGenerating}
-              >
-                {isGenerating ? '生成中...' : generated ? '✓ 再ダウンロード' : 'PPTXをダウンロード'}
-              </button>
+          <div
+            style={{
+              display: showFunnel(step) ? 'grid' : 'block',
+              gridTemplateColumns: showFunnel(step) ? '232px minmax(0, 1fr)' : undefined,
+              gap: 28,
+              alignItems: 'start',
+            }}
+          >
+            {showFunnel(step) && (
+              <aside style={{ position: 'sticky', top: 84, alignSelf: 'start' }}>
+                <GoalFunnel formData={formData} currentStep={step} />
+              </aside>
             )}
-          </div>
 
-          {generated && step === 10 && (
-            <div style={{
-              marginTop: 20,
-              padding: '14px 20px',
-              background: 'rgba(123,183,133,.14)',
-              border: '1px solid rgba(123,183,133,.30)',
-              borderRadius: 'var(--r)',
-              fontSize: '.875rem',
-              color: 'var(--color-text)',
-              textAlign: 'center',
-            }}>
-              ✓ PPTXが生成されました。ダウンロードされたファイルを上長に送付してください。
+            <div style={{ minWidth: 0 }}>
+              {/* Form card */}
+              <div className="glass-panel" style={{ marginBottom: 24 }}>
+                {step === 1 && <CoverForm data={formData.cover} onChange={updateCover} />}
+                {step === 2 && <CompanyGoalForm data={formData.group} onChange={updateGroup} title="01｜グループ目標 記入シート" labelPrefix="グループ" />}
+                {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" parentStrategicFocus={formData.group.strategicFocus} parentLabelPrefix="グループ" />}
+                {step === 4 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
+                {step === 5 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
+                {step === 6 && <MarketValueForm data={formData.personal} onChange={updatePersonal} />}
+                {step === 7 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
+                {step === 8 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
+                {step === 9 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
+                {step === 10 && <ConfirmView data={formData} />}
+              </div>
+
+              {/* Navigation buttons */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => navigate(step - 1)}
+                  disabled={step === 1}
+                >
+                  ← 前へ
+                </button>
+
+                {step < 10 ? (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => navigate(step + 1)}
+                  >
+                    次へ →
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-primary btn-lg"
+                    onClick={handleDownload}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? '生成中...' : generated ? '✓ 再ダウンロード' : 'PPTXをダウンロード'}
+                  </button>
+                )}
+              </div>
+
+              {generated && step === 10 && (
+                <div style={{
+                  marginTop: 20,
+                  padding: '14px 20px',
+                  background: 'rgba(123,183,133,.14)',
+                  border: '1px solid rgba(123,183,133,.30)',
+                  borderRadius: 'var(--r)',
+                  fontSize: '.875rem',
+                  color: 'var(--color-text)',
+                  textAlign: 'center',
+                }}>
+                  ✓ PPTXが生成されました。ダウンロードされたファイルを上長に送付してください。
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </main>
       </div>
     </>
