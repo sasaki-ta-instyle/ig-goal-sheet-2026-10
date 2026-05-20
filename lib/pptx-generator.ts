@@ -388,19 +388,28 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   textBox(sl, 0.4 + slBoxW + 0.16, y, W - 0.8 - slBoxW - 0.16, 0.4, c.slNote || '（上長との合意メモ未記入）');
   y += 0.55;
 
-  // ④ 自分の市場価値（自己見積もり）
+  // ④ 自分の市場価値（自己見積もり） — 見積書スタイル（3 明細 + 合計）
   addSectionLabel(sl, y, '④ 自分の市場価値（自己見積もり）');
   y += 0.3;
-  const mvColWidths = [1.6, 2.4, W - 0.8 - 1.6 - 2.4];
-  const mvRows = c.marketValue.map(r => {
+  const ITEM_INDEX = ['①', '②', '③', '④', '⑤'];
+  const mvColWidths = [0.5, 1.8, W - 0.8 - 0.5 - 1.8 - 2.0, 2.0];
+  const mvRows = c.marketValue.map((r, i) => {
     const amount = r.amount && r.amount.trim() !== ''
       ? `¥ ${Number(r.amount).toLocaleString('ja-JP')} / 年`
       : '—';
-    return [r.label || '—', amount, r.rationale || '—'];
+    return [ITEM_INDEX[i] ?? `${i + 1}.`, r.label || '—', r.rationale || '—', amount];
   });
-  addTable(sl, y, ['買い手', '自己見積もり年収', 'その値段の根拠（顧客・貢献・需要の中身）'],
+  addTable(sl, y, ['No.', '項目', '根拠（顧客・貢献・需要の中身）', '金額'],
     mvRows, mvColWidths);
   y += 0.3 + mvRows.length * 0.38;
+  const mvTotal = c.marketValue.reduce(
+    (s, r) => s + (parseInt((r.amount || '').replace(/[^\d]/g, ''), 10) || 0),
+    0,
+  );
+  textBox(sl, 0.4, y, W - 0.8, 0.32,
+    `合計   ¥ ${mvTotal.toLocaleString('ja-JP')} 円 / 年`,
+    { bold: true, fontSize: 9, align: 'right', fill: { color: C.surface2 } });
+  y += 0.4;
 
   // ⑤ 上長からの一言
   addSectionLabel(sl, y, '⑤ 上長からの一言');
