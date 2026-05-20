@@ -118,7 +118,7 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
               >
                 <p
                   style={{
-                    fontSize: '.9375rem',
+                    fontSize: '.8125rem',
                     fontWeight: 700,
                     color: isActive ? 'var(--color-text)' : 'var(--color-text-muted)',
                     letterSpacing: '.04em',
