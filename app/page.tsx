@@ -265,12 +265,12 @@ export default function Home() {
         <StepIndicator current={step} onNavigate={navigate} />
 
         {/* Main content */}
-        <main className="site-main" style={{ maxWidth: showFunnel(step) ? 1340 : 1080, margin: '0 auto', padding: '0 24px 80px' }}>
+        <main className="site-main" style={{ maxWidth: showFunnel(step) ? 1296 : 1080, margin: '0 auto', padding: '0 24px 80px' }}>
 
           <div
             style={{
               display: showFunnel(step) ? 'grid' : 'block',
-              gridTemplateColumns: showFunnel(step) ? '232px minmax(0, 1fr)' : undefined,
+              gridTemplateColumns: showFunnel(step) ? '188px minmax(0, 1fr)' : undefined,
               gap: 28,
               alignItems: 'start',
             }}
