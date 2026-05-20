@@ -6,6 +6,7 @@ import CoverForm from '@/components/forms/CoverForm';
 import CompanyGoalForm from '@/components/forms/CompanyGoalForm';
 import DeptGoalForm from '@/components/forms/DeptGoalForm';
 import PersonalGoalForm from '@/components/forms/PersonalGoalForm';
+import MarketValueForm from '@/components/forms/MarketValueForm';
 import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
@@ -144,7 +145,7 @@ export default function Home() {
   };
 
   const navigate = (s: number) => {
-    if (s >= 1 && s <= 9) setStep(s);
+    if (s >= 1 && s <= 10) setStep(s);
   };
 
   const updateCover = (d: FormData['cover']) => setFormData(prev => ({ ...prev, cover: d }));
@@ -267,10 +268,11 @@ export default function Home() {
             {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" parentStrategicFocus={formData.group.strategicFocus} parentLabelPrefix="グループ" />}
             {step === 4 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
             {step === 5 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
-            {step === 6 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
-            {step === 7 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
-            {step === 8 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
-            {step === 9 && <ConfirmView data={formData} />}
+            {step === 6 && <MarketValueForm data={formData.personal} onChange={updatePersonal} />}
+            {step === 7 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
+            {step === 8 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
+            {step === 9 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
+            {step === 10 && <ConfirmView data={formData} />}
           </div>
 
           {/* Navigation buttons */}
@@ -283,7 +285,7 @@ export default function Home() {
               ← 前へ
             </button>
 
-            {step < 9 ? (
+            {step < 10 ? (
               <button
                 className="btn btn-primary"
                 onClick={() => navigate(step + 1)}
@@ -301,7 +303,7 @@ export default function Home() {
             )}
           </div>
 
-          {generated && step === 9 && (
+          {generated && step === 10 && (
             <div style={{
               marginTop: 20,
               padding: '14px 20px',
