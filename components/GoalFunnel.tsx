@@ -45,13 +45,7 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
   return (
     <div
       style={{
-        background: 'var(--glass-tinted)',
-        borderRadius: 'var(--r)',
-        padding: '20px 14px 24px',
-        backdropFilter: 'saturate(180%) blur(20px)',
-        WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-        boxShadow:
-          'inset 0 1px 0 rgba(255,255,255,.7), 0 4px 16px rgba(53,54,45,.08)',
+        padding: '4px 0 0',
       }}
     >
       <p
