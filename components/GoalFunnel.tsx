@@ -61,23 +61,12 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
           fontWeight: 700,
           color: 'var(--color-text-muted)',
           letterSpacing: '.14em',
-          marginBottom: 4,
+          marginBottom: 16,
           textAlign: 'center',
           textTransform: 'uppercase',
         }}
       >
         Goal Cascade
-      </p>
-      <p
-        style={{
-          fontSize: '.6875rem',
-          color: 'var(--color-text-muted)',
-          textAlign: 'center',
-          marginBottom: 16,
-          lineHeight: 1.5,
-        }}
-      >
-        大きな戦略から個人の動きへ
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -182,21 +171,6 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
         })}
       </div>
 
-      <p
-        style={{
-          marginTop: 14,
-          fontSize: '.625rem',
-          color: 'var(--color-text-muted)',
-          textAlign: 'center',
-          lineHeight: 1.5,
-        }}
-      >
-        {currentStep >= 2 && currentStep <= 5
-          ? `現在：${TIERS.find(t => t.step === currentStep)?.label ?? ''}目標`
-          : currentStep === 6
-          ? '現在：自己見積もり'
-          : '　'}
-      </p>
     </div>
   );
 }
