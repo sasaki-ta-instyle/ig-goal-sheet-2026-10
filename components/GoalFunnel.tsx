@@ -16,14 +16,13 @@ function truncate(s: string | undefined | null, n: number): string {
 interface TierMeta {
   step: number;
   label: string;
-  index: string;
 }
 
 const TIERS: TierMeta[] = [
-  { step: 2, label: 'グループ', index: '01' },
-  { step: 3, label: '会社', index: '02' },
-  { step: 4, label: '部署', index: '03' },
-  { step: 5, label: '個人', index: '04' },
+  { step: 2, label: 'グループ' },
+  { step: 3, label: '会社' },
+  { step: 4, label: '部署' },
+  { step: 5, label: '個人' },
 ];
 
 export default function GoalFunnel({ formData, currentStep }: Props) {
@@ -35,12 +34,12 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
     || formData.personal.currentStatus.find(s => s.label.includes('期待'))?.value
     || '';
 
+  // 入力済みの内容だけ表示。未入力ならプレースホルダーは出さない。
   const summaries: Record<number, string> = {
-    2: truncate(formData.group.strategicFocus, 76) || '戦略の方向性を記入',
-    3: truncate(formData.company.strategicFocus, 76) || '会社の戦略を記入',
-    4: truncate(formData.dept.mission || formData.dept.kgi1.kgi || formData.dept.kgi1.mission, 76)
-      || '部署のミッション / KGI を記入',
-    5: truncate(personalSummary, 76) || '個人の SMART 目標を記入',
+    2: truncate(formData.group.strategicFocus, 76),
+    3: truncate(formData.company.strategicFocus, 76),
+    4: truncate(formData.dept.mission || formData.dept.kgi1.kgi || formData.dept.kgi1.mission, 76),
+    5: truncate(personalSummary, 76),
   };
 
   return (
@@ -76,11 +75,11 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
           const isActive = currentStep === tier.step;
           const isPast = currentStep > tier.step;
           const isFuture = currentStep < tier.step;
-          const taper = 4; // px shaved from each side at the bottom = mortar/funnel slope
+          const taper = 4;
+          const summary = summaries[tier.step];
 
           return (
             <div key={tier.step} style={{ width: '100%', position: 'relative' }}>
-              {/* downward arrow between tiers */}
               {i > 0 && (
                 <div
                   style={{
@@ -101,7 +100,7 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
                 style={{
                   width: `${widthPct}%`,
                   margin: '0 auto',
-                  padding: '10px 12px',
+                  padding: '12px 14px',
                   background: isActive
                     ? 'rgba(255,255,255,.95)'
                     : isPast
@@ -114,63 +113,48 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
                   opacity: isFuture ? 0.55 : 1,
                   transition: 'all 250ms cubic-bezier(.4,0,.2,1)',
                   marginTop: i === 0 ? 0 : 6,
+                  textAlign: 'center',
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    marginBottom: 4,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '.75rem',
-                      fontWeight: 700,
-                      color: isActive ? 'var(--color-text)' : 'var(--color-text-muted)',
-                      letterSpacing: '.02em',
-                    }}
-                  >
-                    {tier.label}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '.5625rem',
-                      color: 'var(--color-text-muted)',
-                      fontWeight: 600,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {tier.index}
-                  </span>
-                </div>
                 <p
                   style={{
-                    fontSize: '.6875rem',
-                    lineHeight: 1.55,
-                    color: isActive
-                      ? 'var(--color-text)'
-                      : isPast
-                      ? 'var(--color-text)'
-                      : 'var(--color-text-muted)',
+                    fontSize: '.9375rem',
+                    fontWeight: 700,
+                    color: isActive ? 'var(--color-text)' : 'var(--color-text-muted)',
+                    letterSpacing: '.04em',
                     margin: 0,
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical',
-                    wordBreak: 'break-word',
+                    lineHeight: 1.3,
                   }}
                 >
-                  {summaries[tier.step]}
+                  {tier.label}
                 </p>
+                {summary && (
+                  <p
+                    style={{
+                      fontSize: '.6875rem',
+                      lineHeight: 1.55,
+                      color: isActive
+                        ? 'var(--color-text)'
+                        : isPast
+                        ? 'var(--color-text)'
+                        : 'var(--color-text-muted)',
+                      margin: '6px 0 0',
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      wordBreak: 'break-word',
+                      textAlign: 'left',
+                    }}
+                  >
+                    {summary}
+                  </p>
+                )}
               </div>
             </div>
           );
         })}
       </div>
-
     </div>
   );
 }
