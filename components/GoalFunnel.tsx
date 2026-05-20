@@ -26,12 +26,9 @@ const TIERS: TierMeta[] = [
 ];
 
 export default function GoalFunnel({ formData, currentStep }: Props) {
-  const personalSummary = formData.personal.smartGoals
-    .map(g => g.s)
-    .filter(s => s && s.trim())
-    .join(' / ')
-    || formData.personal.kpiContribs.map(k => k.myPart).filter(s => s && s.trim()).join(' / ')
-    || formData.personal.currentStatus.find(s => s.label.includes('期待'))?.value
+  // 個人タイルには「今期の役割・期待（自己認識）」を優先表示
+  const personalSummary =
+    formData.personal.currentStatus.find(s => s.label.includes('役割') || s.label.includes('期待'))?.value
     || '';
 
   // 入力済みの内容だけ表示。未入力ならプレースホルダーは出さない。
@@ -138,7 +135,7 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: 'vertical',
                       wordBreak: 'break-word',
-                      textAlign: 'left',
+                      textAlign: 'center',
                     }}
                   >
                     {summary}
