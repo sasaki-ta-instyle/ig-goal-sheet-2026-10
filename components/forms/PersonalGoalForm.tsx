@@ -89,7 +89,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
         <table className="data-table">
           <thead>
             <tr>
-              <th style={{ width: '35%' }}>項目</th>
+              <th style={{ width: '24%' }}>項目</th>
               <th>内容・記入欄</th>
             </tr>
           </thead>
