@@ -104,7 +104,7 @@ function textBox(sl: pptxgen.Slide, x: number, y: number, w: number, h: number, 
   });
 }
 
-// スライド1: カバー
+// スライド1/9: カバー
 function slide1(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
@@ -153,7 +153,7 @@ function slide1(prs: InstanceType<typeof pptxgen>, d: FormData) {
   });
 }
 
-// スライド2/3: グループ目標 / 会社目標（同じレイアウト・ラベルだけ差し替え）
+// スライド2/9・3/9: グループ目標 / 会社目標（同じレイアウト・ラベルだけ差し替え）
 function slideGoal(prs: InstanceType<typeof pptxgen>, d: FormData['company'], header: string, sub: string, prefix: string) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
@@ -190,8 +190,8 @@ function slideGoal(prs: InstanceType<typeof pptxgen>, d: FormData['company'], he
   y += 0.3 + 0.28 * 3;
 }
 
-// スライド3: 部署目標
-function slide3(prs: InstanceType<typeof pptxgen>, d: FormData) {
+// スライド4/9: 部署目標
+function slideDept(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
@@ -245,8 +245,8 @@ function slide3(prs: InstanceType<typeof pptxgen>, d: FormData) {
   addTable(sl, y, ['#', '施策内容', '期待効果', '期限'], actionRows, [0.4, 4.5, 4.5, 1.5]);
 }
 
-// スライド4: 個人目標
-function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
+// スライド5/9: 個人目標
+function slidePersonal(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
@@ -394,7 +394,7 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   textBox(sl, 0.4, y, W - 0.8, 0.6, c.supervisorComment || '—');
 }
 
-// スライド5: 自己見積もり（個人目標とグレードの間。アプリでも独立ステップ）
+// スライド6/9: 自己見積もり（個人目標とグレードの間。アプリでも独立ステップ）
 function slideMarketValue(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
@@ -431,8 +431,8 @@ function slideMarketValue(prs: InstanceType<typeof pptxgen>, d: FormData) {
     { bold: true, fontSize: 10, align: 'right', fill: { color: C.surface2 } });
 }
 
-// スライド5: グレード表
-function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expectations: Record<string, string>) {
+// スライド7/9: グレード表
+function slideGrade(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expectations: Record<string, string>) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
@@ -551,8 +551,8 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
   });
 }
 
-// スライド6: 昇格・昇給採点シート
-function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
+// スライド8/9: 昇格・昇給採点シート
+function slidePromotion(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
@@ -632,8 +632,8 @@ function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
   });
 }
 
-// スライド7: ボーナス評価採点シート
-function slide7(prs: InstanceType<typeof pptxgen>, d: FormData) {
+// スライド9/9: ボーナス評価採点シート
+function slideBonus(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
@@ -705,12 +705,12 @@ export async function generatePptx(data: FormData) {
   slide1(prs, data);
   slideGoal(prs, data.group, '01｜グループ目標 記入シート', 'INSTYLE GROUP｜人事制度　2 / 9', 'グループ');
   slideGoal(prs, data.company, '02｜会社目標 記入シート', 'INSTYLE GROUP｜人事制度　3 / 9', '会社');
-  slide3(prs, data);
-  slide4(prs, data);
+  slideDept(prs, data);
+  slidePersonal(prs, data);
   slideMarketValue(prs, data);
-  slide5(prs, data.cover.grade, data.gradeExpectations as Record<string, string>);
-  slide6(prs, data);
-  slide7(prs, data);
+  slideGrade(prs, data.cover.grade, data.gradeExpectations as Record<string, string>);
+  slidePromotion(prs, data);
+  slideBonus(prs, data);
 
   const sanitize = (s: string) => s.replace(/[\\/:*?"<>|]/g, '_');
   const name = sanitize(data.cover.name || '社員');
