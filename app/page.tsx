@@ -50,9 +50,10 @@ function normalizeMarketValue(input: unknown, defaults: MarketValueRow[]): Marke
     const raw = input[i] as Partial<MarketValueRow> | undefined;
     if (!raw || typeof raw !== 'object') return def;
     const rawLabel = typeof raw.label === 'string' ? raw.label : '';
+    const rawAmount = raw.amount !== undefined && raw.amount !== null ? String(raw.amount) : '';
     return {
       label: legacyBuyerLabels.includes(rawLabel) ? '' : rawLabel,
-      amount: typeof raw.amount === 'string' ? raw.amount.replace(/[^\d]/g, '') : '',
+      amount: rawAmount.replace(/[^\d]/g, ''),
       rationale: raw.rationale ?? '',
     };
   });
@@ -415,7 +416,7 @@ function ConfirmView({ data }: { data: FormData }) {
       }}>
         <strong style={{ color: 'var(--color-text)' }}>出力されるスライド：</strong>
         <br />
-        1. カバー &nbsp; 2. グループ目標 &nbsp; 3. 会社目標 &nbsp; 4. 部署目標 &nbsp; 5. 個人目標 &nbsp; 6. グレード表 &nbsp; 7. 昇格・昇給採点 &nbsp; 8. ボーナス評価採点
+        1. カバー &nbsp; 2. グループ目標 &nbsp; 3. 会社目標 &nbsp; 4. 部署目標 &nbsp; 5. 個人目標 &nbsp; 6. 自己見積もり &nbsp; 7. グレード表 &nbsp; 8. 昇格・昇給採点 &nbsp; 9. ボーナス評価採点
       </div>
     </div>
   );
