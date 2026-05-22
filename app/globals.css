@@ -243,3 +243,14 @@ textarea.input { resize: vertical; min-height: 80px; line-height: 1.6; }
   .site-header { padding: 24px 20px 20px !important; }
   .site-main { padding: 0 16px 60px !important; }
 }
+
+/* ── Commitment compare block (Step 6) ── */
+@media (max-width: 640px) {
+  .commitment-compare {
+    grid-template-columns: 1fr !important;
+    text-align: left;
+  }
+  .commitment-compare > div:last-child {
+    align-items: flex-start !important;
+  }
+}

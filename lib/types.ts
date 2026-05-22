@@ -181,6 +181,23 @@ export const GRADE_TABLE: GradeTier[] = [
   ]},
 ];
 
+export function getMonthlySalaryByGrade(grade: Grade | '' | null | undefined): number | null {
+  if (!grade) return null;
+  for (const tier of GRADE_TABLE) {
+    const hit = tier.grades.find(g => g.key === grade);
+    if (hit) {
+      const n = parseInt(hit.salary.replace(/[^\d]/g, ''), 10);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    }
+  }
+  return null;
+}
+
+export function getAnnualSalaryByGrade(grade: Grade | '' | null | undefined): number | null {
+  const monthly = getMonthlySalaryByGrade(grade);
+  return monthly == null ? null : monthly * 12;
+}
+
 export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flatMap(tier =>
   tier.grades
     .filter(g => g.key !== 'I')

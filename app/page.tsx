@@ -298,7 +298,7 @@ export default function Home() {
                 {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" parentStrategicFocus={formData.group.strategicFocus} parentLabelPrefix="グループ" />}
                 {step === 4 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
                 {step === 5 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
-                {step === 6 && <CommitmentForm data={formData.personal} onChange={updatePersonal} />}
+                {step === 6 && <CommitmentForm data={formData.personal} grade={formData.cover.grade} onChange={updatePersonal} />}
                 {step === 7 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
                 {step === 8 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
                 {step === 9 && <BonusForm data={formData.bonus} onChange={updateBonus} />}

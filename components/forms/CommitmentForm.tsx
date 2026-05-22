@@ -1,14 +1,15 @@
 'use client';
-import { PersonalGoalData, CommitmentRow } from '@/lib/types';
+import { PersonalGoalData, CommitmentRow, Grade, getAnnualSalaryByGrade } from '@/lib/types';
 
 interface Props {
   data: PersonalGoalData;
+  grade: Grade | '';
   onChange: (data: PersonalGoalData) => void;
 }
 
 const ITEM_INDEX = ['①', '②', '③'];
 
-export default function CommitmentForm({ data, onChange }: Props) {
+export default function CommitmentForm({ data, grade, onChange }: Props) {
   const updateCommitment = (i: number, field: keyof CommitmentRow, value: string) => {
     const arr = data.commitment.map((r, idx) => (idx === i ? { ...r, [field]: value } : r));
     onChange({ ...data, commitment: arr });
@@ -25,6 +26,12 @@ export default function CommitmentForm({ data, onChange }: Props) {
   const rows = data.commitment.slice(0, 3);
   const total = rows.reduce((s, r) => s + (parseInt(r.amount || '0', 10) || 0), 0);
 
+  const baseAnnual = getAnnualSalaryByGrade(grade);
+  const hasBase = baseAnnual != null;
+  const diff = hasBase ? total - baseAnnual : null;
+  const diffSign = diff == null ? '' : diff > 0 ? '+' : diff < 0 ? '−' : '±';
+  const diffAbs = diff == null ? 0 : Math.abs(diff);
+
   return (
     <div>
       <p className="section-title">05｜コミットメント 記入シート</p>
@@ -33,6 +40,80 @@ export default function CommitmentForm({ data, onChange }: Props) {
       <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
         <strong>報酬は、申告するものではなく、獲得するもの。</strong>西村さんから見て、あなたはこのグレードでこの<strong>基準年収</strong>。それに対してあなた自身は、提供している（提供できる）価値を積み上げ、合計いくらの<strong>コミットメント</strong>になるか、根拠から書き出してください。出した数字は、<strong>半年後に行動と結果で答え合わせ</strong>をします。
       </p>
+
+      {/* 基準年収 vs コミットメント合計 */}
+      <div
+        className="commitment-compare"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto 1fr',
+          alignItems: 'center',
+          columnGap: 16,
+          rowGap: 12,
+          padding: '14px 20px',
+          marginBottom: 20,
+          background: 'var(--glass-tint-warm)',
+          borderRadius: 'var(--radius-md, 12px)',
+        }}
+      >
+        {/* 左: グレード × 基準年収 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span style={{ fontSize: '.6875rem', color: 'var(--color-text-muted)', letterSpacing: '.04em' }}>
+            グレード年収
+          </span>
+          {grade ? (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1 }}>{grade}</span>
+              {hasBase ? (
+                <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>
+                  ¥ {formatYen(String(baseAnnual))}{' '}
+                  <span style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>/ 年</span>
+                </span>
+              ) : (
+                <span style={{ fontSize: '.875rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>—（基準なし）</span>
+              )}
+            </div>
+          ) : (
+            <div style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+              カバー画面でグレードを選択してください
+            </div>
+          )}
+        </div>
+
+        {/* 中央: 差分 */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          {hasBase && total > 0 ? (
+            <>
+              <span style={{ fontSize: '.6875rem', color: 'var(--color-text-muted)', letterSpacing: '.04em' }}>
+                差分
+              </span>
+              <span
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  color: diff! > 0 ? 'var(--color-text)' : diff! < 0 ? 'var(--color-text-muted)' : 'var(--color-text-muted)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {diffSign} ¥ {formatYen(String(diffAbs))}
+              </span>
+            </>
+          ) : (
+            <span style={{ fontSize: '1.25rem', color: 'var(--color-text-muted)' }}>→</span>
+          )}
+        </div>
+
+        {/* 右: コミットメント合計 */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+          <span style={{ fontSize: '.6875rem', color: 'var(--color-text-muted)', letterSpacing: '.04em' }}>
+            コミットメント合計
+          </span>
+          <span style={{ fontSize: '1.125rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+            ¥ {formatYen(String(total))}{' '}
+            <span style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>/ 年</span>
+          </span>
+        </div>
+      </div>
 
       {/* 3 項目テーブル */}
       <div className="table-wrap" style={{ marginBottom: 24 }}>
