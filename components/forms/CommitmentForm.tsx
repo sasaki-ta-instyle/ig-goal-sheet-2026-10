@@ -92,18 +92,13 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
               </span>
               <span
                 style={{
-                  fontSize: '1rem',
+                  fontSize: '1.125rem',
                   fontWeight: 700,
                   color: diff! > 0 ? 'var(--color-text)' : 'var(--color-text-muted)',
                   whiteSpace: 'nowrap',
                 }}
               >
-                {diffSign} ¥ {formatYen(String(diffAbs))}
-                {diffPct != null && (
-                  <span style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', fontWeight: 500, marginLeft: 6 }}>
-                    ({diffSign}{diffPctAbs}%)
-                  </span>
-                )}
+                {diffPct != null ? `${diffSign}${diffPctAbs}%` : `${diffSign} ¥ ${formatYen(String(diffAbs))}`}
               </span>
             </>
           ) : (
