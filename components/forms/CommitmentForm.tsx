@@ -31,6 +31,10 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
   const diff = hasBase ? total - baseAnnual : null;
   const diffSign = diff == null ? '' : diff > 0 ? '+' : diff < 0 ? '−' : '±';
   const diffAbs = diff == null ? 0 : Math.abs(diff);
+  const diffPct = hasBase && baseAnnual > 0 && diff != null
+    ? Math.round((diff / baseAnnual) * 1000) / 10
+    : null;
+  const diffPctAbs = diffPct == null ? 0 : Math.abs(diffPct);
 
   return (
     <div>
@@ -95,6 +99,11 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
                 }}
               >
                 {diffSign} ¥ {formatYen(String(diffAbs))}
+                {diffPct != null && (
+                  <span style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', fontWeight: 500, marginLeft: 6 }}>
+                    ({diffSign}{diffPctAbs}%)
+                  </span>
+                )}
               </span>
             </>
           ) : (
