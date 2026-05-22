@@ -51,7 +51,7 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
           gap: 40,
           padding: '14px 20px',
           marginBottom: 20,
-          background: '#f5f3ef',
+          background: '#fbfbf9',
           borderRadius: 'var(--radius-md, 12px)',
         }}
       >
