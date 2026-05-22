@@ -394,26 +394,26 @@ function slidePersonal(prs: InstanceType<typeof pptxgen>, d: FormData) {
   textBox(sl, 0.4, y, W - 0.8, 0.6, c.supervisorComment || '—');
 }
 
-// スライド6/9: 自己見積もり（個人目標とグレードの間。アプリでも独立ステップ）
-function slideMarketValue(prs: InstanceType<typeof pptxgen>, d: FormData) {
+// スライド6/9: コミットメント（個人目標とグレードの間。アプリでも独立ステップ）
+function slideCommitment(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
-  addSlideHeader(sl, '05｜自己見積もり 記入シート', 'INSTYLE GROUP｜人事制度　6 / 9');
+  addSlideHeader(sl, '05｜コミットメント 記入シート', 'INSTYLE GROUP｜人事制度　6 / 9');
 
   const c = d.personal;
   let y = 1.05;
 
-  addSectionLabel(sl, y, '自分の市場価値（自己見積もり）');
+  addSectionLabel(sl, y, 'コミットメント');
   y += 0.3;
   textBox(sl, 0.4, y, W - 0.8, 0.7,
-    '今期の自分はいくらで「求められる」人材か。報酬は生み出した価値に従って獲得するもの。希望年収ではなく、提供している（提供できる）価値の根拠を 3 つ挙げ、見積書のように内訳と金額を書き出した内容。下に合計を表示する。',
+    '報酬は、申告するものではなく、獲得するもの。希望年収ではなく、今期に提供する価値の根拠を 3 つ挙げ、見積書のように内訳と金額で書き出す。半年後に行動と結果で答え合わせをする。',
     { fontSize: 8, color: C.muted, fill: { color: C.bg } });
   y += 0.78;
 
   const ITEM_INDEX = ['①', '②', '③', '④', '⑤'];
   const mvColWidths = [0.5, W - 0.8 - 0.5 - 2.0, 2.0];
-  const mvRows = c.marketValue.map((r, i) => {
+  const mvRows = c.commitment.map((r, i) => {
     const amount = r.amount && r.amount.trim() !== ''
       ? `¥ ${Number(r.amount).toLocaleString('ja-JP')} / 年`
       : '—';
@@ -422,7 +422,7 @@ function slideMarketValue(prs: InstanceType<typeof pptxgen>, d: FormData) {
   addTable(sl, y, ['No.', '項目・概要', '金額'], mvRows, mvColWidths);
   y += 0.3 + mvRows.length * 0.38;
 
-  const mvTotal = c.marketValue.reduce(
+  const mvTotal = c.commitment.reduce(
     (s, r) => s + (parseInt((r.amount || '').replace(/[^\d]/g, ''), 10) || 0),
     0,
   );
@@ -707,7 +707,7 @@ export async function generatePptx(data: FormData) {
   slideGoal(prs, data.company, '02｜会社目標 記入シート', 'INSTYLE GROUP｜人事制度　3 / 9', '会社');
   slideDept(prs, data);
   slidePersonal(prs, data);
-  slideMarketValue(prs, data);
+  slideCommitment(prs, data);
   slideGrade(prs, data.cover.grade, data.gradeExpectations as Record<string, string>);
   slidePromotion(prs, data);
   slideBonus(prs, data);

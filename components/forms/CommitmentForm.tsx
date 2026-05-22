@@ -1,17 +1,17 @@
 'use client';
-import { PersonalGoalData, MarketValueRow } from '@/lib/types';
+import { PersonalGoalData, CommitmentRow } from '@/lib/types';
 
 interface Props {
   data: PersonalGoalData;
   onChange: (data: PersonalGoalData) => void;
 }
 
-const ITEM_INDEX = ['①', '②', '③', '④', '⑤'];
+const ITEM_INDEX = ['①', '②', '③'];
 
-export default function MarketValueForm({ data, onChange }: Props) {
-  const updateMarket = (i: number, field: keyof MarketValueRow, value: string) => {
-    const arr = data.marketValue.map((r, idx) => (idx === i ? { ...r, [field]: value } : r));
-    onChange({ ...data, marketValue: arr });
+export default function CommitmentForm({ data, onChange }: Props) {
+  const updateCommitment = (i: number, field: keyof CommitmentRow, value: string) => {
+    const arr = data.commitment.map((r, idx) => (idx === i ? { ...r, [field]: value } : r));
+    onChange({ ...data, commitment: arr });
   };
   const formatYen = (raw: string) => {
     if (!raw) return '';
@@ -22,20 +22,19 @@ export default function MarketValueForm({ data, onChange }: Props) {
   const parseYen = (v: string) =>
     v.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/[^\d]/g, '');
 
-  const total = data.marketValue.reduce(
-    (s, r) => s + (parseInt(r.amount || '0', 10) || 0),
-    0,
-  );
+  const rows = data.commitment.slice(0, 3);
+  const total = rows.reduce((s, r) => s + (parseInt(r.amount || '0', 10) || 0), 0);
 
   return (
     <div>
-      <p className="section-title">05｜自己見積もり 記入シート</p>
+      <p className="section-title">05｜コミットメント 記入シート</p>
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 6 }}>自分の市場価値（自己見積もり）</p>
-      <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
-        今期の自分はいくらで<strong>「求められる」</strong>人材か。報酬は<strong>生み出した価値に従って獲得する</strong>もの。希望年収ではなく、提供している（提供できる）価値の根拠を 3 つ挙げ、<strong>見積書</strong>のように内訳と金額を書き出してみてください。下に合計が出ます。
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 6 }}>コミットメントは、希望ではなく、自分で負う約束です。</p>
+      <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
+        <strong>報酬は、申告するものではなく、獲得するもの。</strong>西村さんから見て、あなたはこのグレードでこの<strong>基準年収</strong>。それに対してあなた自身は、提供している（提供できる）価値を積み上げ、合計いくらの<strong>コミットメント</strong>になるか、根拠から書き出してください。出した数字は、<strong>半年後に行動と結果で答え合わせ</strong>をします。
       </p>
 
+      {/* 3 項目テーブル */}
       <div className="table-wrap" style={{ marginBottom: 24 }}>
         <table className="data-table">
           <colgroup>
@@ -51,7 +50,7 @@ export default function MarketValueForm({ data, onChange }: Props) {
             </tr>
           </thead>
           <tbody>
-            {data.marketValue.map((row, i) => (
+            {rows.map((row, i) => (
               <tr key={i}>
                 <td style={{ textAlign: 'center', fontWeight: 600, color: 'var(--color-text-muted)', fontSize: '.8125rem' }}>
                   {ITEM_INDEX[i] ?? `${i + 1}.`}
@@ -61,8 +60,8 @@ export default function MarketValueForm({ data, onChange }: Props) {
                     className="input"
                     style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 72, width: '100%', resize: 'vertical', lineHeight: 1.6 }}
                     value={row.rationale}
-                    onChange={e => updateMarket(i, 'rationale', e.target.value)}
-                    placeholder="項目名と、その値段の根拠（どんな顧客に、どんな貢献をしていて、どこから需要があるか）"
+                    onChange={e => updateCommitment(i, 'rationale', e.target.value)}
+                    placeholder="項目と金額の根拠"
                   />
                 </td>
                 <td>
@@ -73,7 +72,7 @@ export default function MarketValueForm({ data, onChange }: Props) {
                       style={{ padding: '6px 8px', fontSize: '.8125rem', textAlign: 'right', flex: 1 }}
                       inputMode="numeric"
                       value={formatYen(row.amount)}
-                      onChange={e => updateMarket(i, 'amount', parseYen(e.target.value))}
+                      onChange={e => updateCommitment(i, 'amount', parseYen(e.target.value))}
                       placeholder="0"
                     />
                   </div>

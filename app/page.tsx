@@ -7,11 +7,11 @@ import CoverForm from '@/components/forms/CoverForm';
 import CompanyGoalForm from '@/components/forms/CompanyGoalForm';
 import DeptGoalForm from '@/components/forms/DeptGoalForm';
 import PersonalGoalForm from '@/components/forms/PersonalGoalForm';
-import MarketValueForm from '@/components/forms/MarketValueForm';
+import CommitmentForm from '@/components/forms/CommitmentForm';
 import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
-import { createDefaultFormData, CURRENT_PERIOD, FormData, MarketValueRow, SmartGoalRow } from '@/lib/types';
+import { createDefaultFormData, CURRENT_PERIOD, FormData, CommitmentRow, SmartGoalRow } from '@/lib/types';
 
 const STORAGE_KEY = 'instyle-goal-sheet-2026-10-v1';
 
@@ -44,10 +44,10 @@ function normalizeSmartGoals(input: unknown, defaults: SmartGoalRow[]): SmartGoa
 // 旧仕様（買い手×3：会社／グループ／西村さん）の label フィールドは新仕様で型から
 // 削除済みで、自然に捨てられる。amount / rationale だけを引き継ぐ。
 // 行数はデフォルト（3 行固定）を基準にマップし、超過分は意図的に切り捨てる。
-function normalizeMarketValue(input: unknown, defaults: MarketValueRow[]): MarketValueRow[] {
+function normalizeCommitment(input: unknown, defaults: CommitmentRow[]): CommitmentRow[] {
   if (!Array.isArray(input)) return defaults;
   return defaults.map((def, i) => {
-    const raw = input[i] as Partial<MarketValueRow> | undefined;
+    const raw = input[i] as Partial<CommitmentRow> | undefined;
     if (!raw || typeof raw !== 'object') return def;
     const rawAmount = raw.amount !== undefined && raw.amount !== null ? String(raw.amount) : '';
     return {
@@ -80,7 +80,17 @@ function mergeFormData(parsed: unknown): FormData {
       ...def.personal,
       ...(p.personal ?? {}),
       smartGoals: normalizeSmartGoals(p.personal?.smartGoals, def.personal.smartGoals),
-      marketValue: normalizeMarketValue(p.personal?.marketValue, def.personal.marketValue),
+      commitment: normalizeCommitment(
+        (() => {
+          const personal = p.personal as
+            | { commitment?: unknown; marketValue?: unknown }
+            | undefined;
+          const current = personal?.commitment;
+          if (Array.isArray(current) && current.length > 0) return current;
+          return personal?.marketValue;
+        })(),
+        def.personal.commitment,
+      ),
     },
     promotion: { ...def.promotion, ...(p.promotion ?? {}) },
     bonus: { ...def.bonus, ...(p.bonus ?? {}) },
@@ -88,7 +98,7 @@ function mergeFormData(parsed: unknown): FormData {
   };
 }
 
-// 目標カスケードのサイドバーを出すステップ範囲（グループ〜自己見積もり）
+// グループ〜コミットメント までのサイドバー
 function showFunnel(step: number): boolean {
   return step >= 2 && step <= 6;
 }
@@ -288,7 +298,7 @@ export default function Home() {
                 {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" parentStrategicFocus={formData.group.strategicFocus} parentLabelPrefix="グループ" />}
                 {step === 4 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
                 {step === 5 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
-                {step === 6 && <MarketValueForm data={formData.personal} onChange={updatePersonal} />}
+                {step === 6 && <CommitmentForm data={formData.personal} onChange={updatePersonal} />}
                 {step === 7 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
                 {step === 8 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
                 {step === 9 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
@@ -414,7 +424,7 @@ function ConfirmView({ data }: { data: FormData }) {
       }}>
         <strong style={{ color: 'var(--color-text)' }}>出力されるスライド：</strong>
         <br />
-        1. カバー &nbsp; 2. グループ目標 &nbsp; 3. 会社目標 &nbsp; 4. 部署目標 &nbsp; 5. 個人目標 &nbsp; 6. 自己見積もり &nbsp; 7. グレード表 &nbsp; 8. 昇格・昇給採点 &nbsp; 9. ボーナス評価採点
+        1. カバー &nbsp; 2. グループ目標 &nbsp; 3. 会社目標 &nbsp; 4. 部署目標 &nbsp; 5. 個人目標 &nbsp; 6. コミットメント &nbsp; 7. グレード表 &nbsp; 8. 昇格・昇給採点 &nbsp; 9. ボーナス評価採点
       </div>
     </div>
   );

@@ -75,7 +75,7 @@ export interface KpiContribRow {
 
 export type SlLevel = '' | 'S1' | 'S2' | 'S3' | 'S4';
 
-export interface MarketValueRow {
+export interface CommitmentRow {
   amount: string;    // 明細金額（半角数字のみを保持、表示時にカンマ整形）
   rationale: string; // 項目・概要（その金額の根拠：顧客・貢献・需要の中身）
 }
@@ -86,7 +86,7 @@ export interface PersonalGoalData {
   kpiContribs: KpiContribRow[];
   slLevel: SlLevel;
   slNote: string;
-  marketValue: MarketValueRow[];
+  commitment: CommitmentRow[];
   supervisorComment: string;
 }
 
@@ -234,7 +234,7 @@ export function createDefaultFormData(): FormData {
       kpiContribs: Array(3).fill(null).map(() => ({ deptKpi: '', myPart: '' })),
       slLevel: '',
       slNote: '',
-      marketValue: [
+      commitment: [
         { amount: '', rationale: '' },
         { amount: '', rationale: '' },
         { amount: '', rationale: '' },

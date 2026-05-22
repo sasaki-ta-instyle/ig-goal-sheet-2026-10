@@ -6,7 +6,7 @@ const STEPS = [
   { num: 3, label: '会社目標' },
   { num: 4, label: '部署目標' },
   { num: 5, label: '個人目標' },
-  { num: 6, label: '自己見積もり' },
+  { num: 6, label: 'コミットメント' },
   { num: 7, label: 'グレード' },
   { num: 8, label: '昇格評価' },
   { num: 9, label: 'ボーナス' },
