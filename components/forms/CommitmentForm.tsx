@@ -45,19 +45,18 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
       <div
         className="commitment-compare"
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr auto 1fr',
+          display: 'flex',
+          justifyContent: 'center',
           alignItems: 'center',
-          columnGap: 16,
-          rowGap: 12,
+          gap: 40,
           padding: '14px 20px',
           marginBottom: 20,
-          background: 'var(--glass-tint-warm)',
+          background: '#f5f3ef',
           borderRadius: 'var(--radius-md, 12px)',
         }}
       >
         {/* 左: グレード × 基準年収 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <span style={{ fontSize: '.6875rem', color: 'var(--color-text-muted)', letterSpacing: '.04em' }}>
             グレード年収
           </span>
@@ -91,7 +90,7 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
                 style={{
                   fontSize: '1rem',
                   fontWeight: 700,
-                  color: diff! > 0 ? 'var(--color-text)' : diff! < 0 ? 'var(--color-text-muted)' : 'var(--color-text-muted)',
+                  color: diff! > 0 ? 'var(--color-text)' : 'var(--color-text-muted)',
                   whiteSpace: 'nowrap',
                 }}
               >
@@ -104,7 +103,7 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
         </div>
 
         {/* 右: コミットメント合計 */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <span style={{ fontSize: '.6875rem', color: 'var(--color-text-muted)', letterSpacing: '.04em' }}>
             コミットメント合計
           </span>

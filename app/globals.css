@@ -247,10 +247,7 @@ textarea.input { resize: vertical; min-height: 80px; line-height: 1.6; }
 /* ── Commitment compare block (Step 6) ── */
 @media (max-width: 640px) {
   .commitment-compare {
-    grid-template-columns: 1fr !important;
-    text-align: left;
-  }
-  .commitment-compare > div:last-child {
-    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 16px !important;
   }
 }
