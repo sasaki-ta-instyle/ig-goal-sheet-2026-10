@@ -289,6 +289,20 @@ textarea.input {
   accent-color: var(--color-text);
 }
 
+/* 未入力箇所は編集画面と同じく薄い色で見せる。本文の黒色 (-webkit-text-fill-color)
+   が placeholder にも当たってしまい潰れていたのを、placeholder 専用で上書きする。 */
+.share-view fieldset[disabled] input::placeholder,
+.share-view fieldset[disabled] textarea::placeholder {
+  color: var(--color-text-light) !important;
+  -webkit-text-fill-color: var(--color-text-light) !important;
+  opacity: 1;
+}
+/* select の value="" 状態（未選択）も薄く見せる。値が入っているときは通常色。 */
+.share-view fieldset[disabled] select:has(option[value=""]:checked) {
+  color: var(--color-text-light);
+  -webkit-text-fill-color: var(--color-text-light);
+}
+
 /* シェア時は最小高さの縛りも外して、書いた分だけぴったり表示する。
    共通の textarea.input が field-sizing: content を持っているので、ここでは
    インラインで指定された min-height を打ち消すだけでよい。 */
