@@ -11,7 +11,6 @@ export interface KpiNumRow {
   prev: string;
   target: string;
   actual: string;
-  nextTarget: string;
 }
 
 export interface CompanyGoalData {
@@ -33,7 +32,7 @@ export interface DeptKpiNumRow {
   prev: string;
   target: string;
   actual: string;
-  nextTarget: string;
+  relatedKgi?: '' | 'kgi1' | 'kgi2';
 }
 
 export interface DeptKgiRow {
@@ -207,8 +206,8 @@ export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flat
     }))
 );
 
-const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', actual: '', nextTarget: '' });
-const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', nextTarget: '' });
+const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', actual: '' });
+const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', relatedKgi: '' });
 const emptyDeptKgi = (): DeptKgiRow => ({ mission: '', kgi: '' });
 
 export const CURRENT_PERIOD = '2026.10〜2027.3';

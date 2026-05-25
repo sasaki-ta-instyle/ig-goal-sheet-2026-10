@@ -1,5 +1,4 @@
 'use client';
-import { Fragment } from 'react';
 import { DeptGoalData, DeptKpiNumRow, DeptKgiRow, DeptActionRow } from '@/lib/types';
 
 interface Props {
@@ -38,7 +37,7 @@ function TI({ value, onChange, placeholder, autoNumber, compact }: { value: stri
   );
 }
 
-const KPI_COLS: { key: keyof DeptKpiNumRow; label: string; sub: string; autoNumber?: boolean }[] = [
+const KPI_COLS: { key: 'prev' | 'target' | 'actual'; label: string; sub: string; autoNumber?: boolean }[] = [
   { key: 'prev', label: '前期実績', sub: '2026.4〜9', autoNumber: true },
   { key: 'target', label: '今期目標', sub: '2026.10〜2027.3', autoNumber: true },
   { key: 'actual', label: '今期実績', sub: '2026.10〜2027.3', autoNumber: true },
@@ -48,8 +47,11 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
   const set = <K extends keyof DeptGoalData>(key: K, value: DeptGoalData[K]) =>
     onChange({ ...data, [key]: value });
 
-  const updateKpi = (kpiKey: 'kpi1' | 'kpi2' | 'kpi3' | 'kpi4' | 'kpi5', field: keyof DeptKpiNumRow, value: string) =>
-    set(kpiKey, { ...data[kpiKey], [field]: value });
+  const updateKpi = <F extends keyof DeptKpiNumRow>(
+    kpiKey: 'kpi1' | 'kpi2' | 'kpi3' | 'kpi4' | 'kpi5',
+    field: F,
+    value: DeptKpiNumRow[F],
+  ) => set(kpiKey, { ...data[kpiKey], [field]: value });
 
   const updateKgi = (kgiKey: 'kgi1' | 'kgi2', field: keyof DeptKgiRow, value: string) =>
     set(kgiKey, { ...data[kgiKey], [field]: value });
@@ -163,9 +165,28 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
           </thead>
           <tbody>
             {kpiItems.map(item => (
-              <Fragment key={item.key}>
-                <tr>
-                  <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.label}</td>
+              <tr key={item.key}>
+                  <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap', verticalAlign: 'top' }}>
+                    <div>{item.label}</div>
+                    <select
+                      className="input"
+                      style={{
+                        marginTop: 6,
+                        padding: '3px 6px',
+                        fontSize: '.6875rem',
+                        fontWeight: 500,
+                        width: '100%',
+                        color: 'var(--color-text-muted)',
+                      }}
+                      value={data[item.key].relatedKgi ?? ''}
+                      onChange={e => updateKpi(item.key, 'relatedKgi', e.target.value as '' | 'kgi1' | 'kgi2')}
+                      title="該当するKGI"
+                    >
+                      <option value="">該当KGI 未選択</option>
+                      <option value="kgi1">主要KGI①</option>
+                      <option value="kgi2">主要KGI②</option>
+                    </select>
+                  </td>
                   <td>
                     <TI
                       value={data[item.key].label}
@@ -188,28 +209,6 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
                     {calcGrowth(data[item.key].prev, data[item.key].actual)}
                   </td>
                 </tr>
-                <tr>
-                  <td style={{
-                    color: 'var(--color-text-muted)',
-                    fontWeight: 600,
-                    fontSize: '.6875rem',
-                    letterSpacing: '.07em',
-                    textTransform: 'uppercase',
-                    whiteSpace: 'nowrap',
-                    verticalAlign: 'top',
-                    paddingTop: 12,
-                  }}>来期目標</td>
-                  <td colSpan={KPI_COLS.length + 2}>
-                    <textarea
-                      className="input"
-                      style={{ padding: '6px 8px', fontSize: '.8125rem', lineHeight: 1.5, fontFamily: 'inherit', minHeight: 52, resize: 'vertical', width: '100%' }}
-                      value={data[item.key].nextTarget}
-                      onChange={e => updateKpi(item.key, 'nextTarget', e.target.value)}
-                      placeholder="来期目標を自由記入"
-                    />
-                  </td>
-                </tr>
-              </Fragment>
             ))}
           </tbody>
         </table>

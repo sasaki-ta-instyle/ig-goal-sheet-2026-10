@@ -322,7 +322,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
       <textarea
         className="input"
         style={{ width: '100%', minHeight: 96, resize: 'vertical', padding: '8px 10px', fontSize: '.8125rem' }}
-        placeholder="上長が記入。期初の期待・SL の合意・コミットメントへの所感・コメントなど"
+        placeholder="上長が記入。期初の期待・SL の合意・ギャランティへの所感・コメントなど"
         value={data.supervisorComment}
         onChange={e => set('supervisorComment', e.target.value)}
       />

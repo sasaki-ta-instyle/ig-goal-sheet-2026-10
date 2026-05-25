@@ -12,6 +12,7 @@ import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
 import { createDefaultFormData, CURRENT_PERIOD, FormData, CommitmentRow, SmartGoalRow } from '@/lib/types';
+import { encodeFormData, buildShortShareUrl, buildLongShareUrl, baseFromPathname } from '@/lib/share-codec';
 
 const STORAGE_KEY = 'instyle-goal-sheet-2026-10-v1';
 
@@ -98,7 +99,7 @@ function mergeFormData(parsed: unknown): FormData {
   };
 }
 
-// グループ〜コミットメント までのサイドバー
+// グループ〜ギャランティ までのサイドバー
 function showFunnel(step: number): boolean {
   return step >= 2 && step <= 6;
 }
@@ -113,8 +114,10 @@ export default function Home() {
     } catch {}
     return createDefaultFormData();
   });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generated, setGenerated] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [shareCopied, setShareCopied] = useState(false);
+  const [sharePending, setSharePending] = useState(false);
+  const [shareNotice, setShareNotice] = useState('');
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
@@ -125,7 +128,9 @@ export default function Home() {
     localStorage.removeItem(STORAGE_KEY);
     setFormData(createDefaultFormData());
     setStep(1);
-    setGenerated(false);
+    setShareUrl('');
+    setShareCopied(false);
+    setShareNotice('');
   };
 
   const handleExport = () => {
@@ -150,7 +155,9 @@ export default function Home() {
         const parsed = JSON.parse(reader.result as string);
         setFormData(mergeFormData(parsed));
         setStep(1);
-        setGenerated(false);
+        setShareUrl('');
+        setShareCopied(false);
+        setShareNotice('');
       } catch {
         alert('ファイルの読み込みに失敗しました。正しいJSONファイルを選択してください。');
       }
@@ -172,23 +179,48 @@ export default function Home() {
   const updateBonus = (d: FormData['bonus']) => setFormData(prev => ({ ...prev, bonus: d }));
   const updateGradeExpectations = (d: FormData['gradeExpectations']) => setFormData(prev => ({ ...prev, gradeExpectations: d }));
 
-  const handleDownload = async () => {
+  const handleShare = async () => {
     const { cover } = formData;
     if (!cover.name || !cover.company || !cover.grade || !cover.period) {
       alert('カバー情報（所属法人・氏名・グレード・期）をすべて入力してください。');
       setStep(1);
       return;
     }
-    setIsGenerating(true);
+    setSharePending(true);
+    setShareNotice('');
+    let url = '';
     try {
-      const { generatePptx } = await import('@/lib/pptx-generator');
-      await generatePptx(formData);
-      setGenerated(true);
-    } catch (e) {
-      console.error(e);
-      alert('PPTXの生成に失敗しました。');
+      const base = baseFromPathname(window.location.pathname);
+      const res = await fetch(`${base}/api/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        const { token } = (await res.json()) as { token?: string };
+        if (token) {
+          url = buildShortShareUrl(window.location.origin, window.location.pathname, token);
+        }
+      }
+    } catch {
+      // network error → fall through to long URL
+    }
+    if (!url) {
+      const encoded = encodeFormData(formData);
+      url = buildLongShareUrl(window.location.origin, window.location.pathname, encoded);
+      setShareNotice('このページでは短縮URLが発行できないため、データを埋め込んだ長いURLになっています。本番（app.instyle.group）からは短いURLが発行されます。');
+    } else {
+      setShareNotice('');
+    }
+    setShareUrl(url);
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2400);
+    } catch {
+      setShareCopied(false);
     } finally {
-      setIsGenerating(false);
+      setSharePending(false);
     }
   };
 
@@ -221,7 +253,7 @@ export default function Home() {
                 目標設定シート <span style={{ fontSize: '1rem', fontWeight: 400, opacity: 0.6 }}>2026.10〜2027.3</span>
               </h1>
               <p style={{ fontSize: '.8125rem', color: 'rgba(243,241,238,.45)' }}>
-                入力内容は自動保存されます。PPTXスライドとして書き出せます。<br />
+                入力内容は自動保存されます。完成後はシェア用URLでオーナーに共有できます。<br />
                 来期のシート作成に備えて、完成後は「データを保存」（JSON形式）しておきましょう。来期は読み込むだけで引き継げます。
               </p>
             </div>
@@ -325,26 +357,84 @@ export default function Home() {
                 ) : (
                   <button
                     className="btn btn-primary btn-lg"
-                    onClick={handleDownload}
-                    disabled={isGenerating}
+                    onClick={handleShare}
+                    disabled={sharePending}
                   >
-                    {isGenerating ? '生成中...' : generated ? '✓ 再ダウンロード' : 'PPTXをダウンロード'}
+                    {sharePending
+                      ? '生成中…'
+                      : shareCopied
+                        ? '✓ URLをコピーしました'
+                        : shareUrl
+                          ? '🔗 URLを再生成してコピー'
+                          : '🔗 シェア用URLを作成してコピー'}
                   </button>
                 )}
               </div>
 
-              {generated && step === 10 && (
+              {shareUrl && step === 10 && (
                 <div style={{
                   marginTop: 20,
-                  padding: '14px 20px',
+                  padding: '16px 20px',
                   background: 'rgba(123,183,133,.14)',
                   border: '1px solid rgba(123,183,133,.30)',
                   borderRadius: 'var(--r)',
                   fontSize: '.875rem',
                   color: 'var(--color-text)',
-                  textAlign: 'center',
+                  display: 'grid',
+                  gap: 10,
                 }}>
-                  ✓ PPTXが生成されました。ダウンロードされたファイルを上長に送付してください。
+                  <div style={{ fontWeight: 600 }}>
+                    {shareCopied ? '✓ クリップボードにコピーしました。Slack やメールに貼り付けて共有してください。' : 'シェア用URLを生成しました。'}
+                  </div>
+                  {shareNotice && (
+                    <div style={{ fontSize: '.75rem', color: 'var(--color-warning)' }}>
+                      ⚠ {shareNotice}
+                    </div>
+                  )}
+                  <code
+                    style={{
+                      fontSize: '.7rem',
+                      color: 'var(--color-text-muted)',
+                      wordBreak: 'break-all',
+                      background: 'rgba(255,255,255,.55)',
+                      padding: '8px 10px',
+                      borderRadius: 'var(--r-sm)',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {shareUrl.length > 120 ? `${shareUrl.slice(0, 120)}…（全${shareUrl.length}字）` : shareUrl}
+                  </code>
+                  <div style={{ display: 'flex', gap: 12, fontSize: '.75rem' }}>
+                    <a
+                      href={shareUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--color-info)', textDecoration: 'underline' }}
+                    >
+                      新規タブで見え方を確認 →
+                    </a>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(shareUrl);
+                          setShareCopied(true);
+                          setTimeout(() => setShareCopied(false), 2400);
+                        } catch {}
+                      }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--color-info)',
+                        cursor: 'pointer',
+                        padding: 0,
+                        textDecoration: 'underline',
+                        fontSize: '.75rem',
+                      }}
+                    >
+                      もう一度コピー
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -392,7 +482,7 @@ function ConfirmView({ data }: { data: FormData }) {
     <div>
       <p className="section-title">確認・出力</p>
       <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: 24 }}>
-        入力内容を確認して「PPTXをダウンロード」ボタンを押してください。
+        入力内容を確認して「シェア用URLを作成してコピー」ボタンを押してください。受け取った人はブラウザで開くと、あなたが入力したそのままの見た目で内容を確認できます。
       </p>
 
       <div className="table-wrap" style={{ marginBottom: 28 }}>
@@ -422,9 +512,9 @@ function ConfirmView({ data }: { data: FormData }) {
         color: 'var(--color-text-muted)',
         lineHeight: 1.8,
       }}>
-        <strong style={{ color: 'var(--color-text)' }}>出力されるスライド：</strong>
+        <strong style={{ color: 'var(--color-text)' }}>共有されるセクション：</strong>
         <br />
-        1. カバー &nbsp; 2. グループ目標 &nbsp; 3. 会社目標 &nbsp; 4. 部署目標 &nbsp; 5. 個人目標 &nbsp; 6. コミットメント &nbsp; 7. グレード表 &nbsp; 8. 昇格・昇給採点 &nbsp; 9. ボーナス評価採点
+        1. カバー &nbsp; 2. グループ目標 &nbsp; 3. 会社目標 &nbsp; 4. 部署目標 &nbsp; 5. 個人目標 &nbsp; 6. ギャランティ &nbsp; 7. グレード表 &nbsp; 8. 昇格・昇給採点 &nbsp; 9. ボーナス評価採点
       </div>
     </div>
   );

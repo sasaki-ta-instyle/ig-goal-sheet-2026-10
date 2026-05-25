@@ -33,7 +33,9 @@
   --r-xl:   32px;
   --r-pill: 999px;
 
-  --font-sans: var(--font-lato, 'Lato'), var(--font-noto-sans-jp, 'Noto Sans JP'), sans-serif;
+  /* CDN: gen-interface-jp@0.5.0/all.css — 8 weights (100–800) / loaded in app/layout.tsx */
+  --font-sans:    'Gen Interface JP', sans-serif;
+  --font-display: 'Gen Interface JP Display', 'Gen Interface JP', sans-serif;
   --ease-out: 250ms cubic-bezier(.4,0,.2,1);
 }
 
@@ -170,7 +172,16 @@ body {
 }
 .input::placeholder { color: var(--color-text-light); }
 select.input { cursor: pointer; }
-textarea.input { resize: vertical; min-height: 80px; line-height: 1.6; }
+textarea.input {
+  /* field-sizing で content に合わせて自動拡張。手動 resize は無効化して、
+     入力中もシェア時も同じ挙動（書いた分だけ枠が伸びる）に統一する。
+     min-height はインラインで上書きされる箇所もあるが、ここの 80px が下限のデフォルト。
+     field-sizing は Chrome 123+ / Safari 17.4+ / Firefox 129+。 */
+  field-sizing: content;
+  resize: none;
+  min-height: 80px;
+  line-height: 1.6;
+}
 
 /* ── Section title ── */
 .section-title {
@@ -250,4 +261,41 @@ textarea.input { resize: vertical; min-height: 80px; line-height: 1.6; }
     flex-direction: column !important;
     gap: 16px !important;
   }
+}
+
+/* ── Share view (read-only) ── */
+/* fieldset[disabled] で全 form control を非操作化しつつ、見た目は変えずに残す。
+   特に BonusForm / PromotionForm はスコア選択を <button aria-pressed> で表現しているため、
+   button を display:none にしてはいけない。 */
+.share-view fieldset[disabled] input,
+.share-view fieldset[disabled] textarea,
+.share-view fieldset[disabled] select,
+.share-view fieldset[disabled] button {
+  cursor: default;
+  opacity: 1;
+}
+/* text 系の input / textarea / select だけ閲覧用の色背景を当てる。
+   radio / checkbox はネイティブコントロールなので背景を上書きすると見た目が崩れる
+   （SL理論セクションが代表例）。除外する。 */
+.share-view fieldset[disabled] textarea,
+.share-view fieldset[disabled] select,
+.share-view fieldset[disabled] input:not([type="radio"]):not([type="checkbox"]) {
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+  background: var(--glass-warm);
+}
+.share-view fieldset[disabled] input[type="radio"],
+.share-view fieldset[disabled] input[type="checkbox"] {
+  accent-color: var(--color-text);
+}
+
+/* シェア時は最小高さの縛りも外して、書いた分だけぴったり表示する。
+   共通の textarea.input が field-sizing: content を持っているので、ここでは
+   インラインで指定された min-height を打ち消すだけでよい。 */
+.share-view fieldset[disabled] textarea {
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+  white-space: pre-wrap;
+  word-break: break-word;
 }

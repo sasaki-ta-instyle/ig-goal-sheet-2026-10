@@ -38,14 +38,22 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
 
   return (
     <div>
-      <p className="section-title">05｜コミットメント 記入シート</p>
+      <p className="section-title">05｜ギャランティ 記入シート</p>
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 6 }}>コミットメントは、希望ではなく、自分で負う約束です。</p>
+      <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 8, lineHeight: 1.6 }}>
+        経営はお金でお金を買うこと。報酬は申告するものではなく、あなたが<strong>バリューを出す約束をした分だけ保証されるもの</strong>であり、成長し、達成した結果、獲得するものです。
+      </p>
+      <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 8, lineHeight: 1.6 }}>
+        あなたの報酬、年収で、西村さんは何を買えるのか？<br />
+        あなたはあなたの報酬で、何をチームや会社、西村さんに売ろうとしているのか？<br />
+        あなたはどうバリューを出すのか？ どう貢献するのか？<br />
+        あなたのその<strong>約束＝保証（ギャランティ）</strong>に対して支払われるものが<strong>報酬（ギャランティ）</strong>です。
+      </p>
       <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
-        <strong>報酬は、申告するものではなく、獲得するもの。</strong>西村さんから見て、あなたはこのグレードでこの<strong>基準年収</strong>。それに対してあなた自身は、提供している（提供できる）価値を積み上げ、合計いくらの<strong>コミットメント</strong>になるか、根拠から書き出してください。出した数字は、<strong>半年後に行動と結果で答え合わせ</strong>をします。
+        あなたが1年で売ろうとしているもの（貢献内容）の価値が<strong>あなたの報酬、年収を超える</strong>ようにしてください。赤字である場合は正直にそう申告して、改善してください。あまりにバリューと報酬がかけ離れていれば、その調整のために<strong>降格・降給</strong>します。あなたが今期、どれだけの貢献をするつもりかを、<strong>数字的根拠</strong>と共に書き出してください。ここで出された数字や項目の進捗状況は、適宜面談等で確認されます。
       </p>
 
-      {/* 基準年収 vs コミットメント合計 */}
+      {/* 基準年収 vs ギャランティ合計 */}
       <div
         className="commitment-compare"
         style={{
@@ -106,10 +114,10 @@ export default function CommitmentForm({ data, grade, onChange }: Props) {
           )}
         </div>
 
-        {/* 右: コミットメント合計 */}
+        {/* 右: ギャランティ合計 */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <span style={{ fontSize: '.6875rem', color: 'var(--color-text-muted)', letterSpacing: '.04em' }}>
-            コミットメント合計
+            ギャランティ合計
           </span>
           <span style={{ fontSize: '1.125rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
             ¥ {formatYen(String(total))}{' '}

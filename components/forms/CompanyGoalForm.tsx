@@ -78,12 +78,11 @@ function KpiNumTable({
     <div className="table-wrap" style={{ marginBottom: 24 }}>
       <table className="data-table" style={{ tableLayout: 'fixed', width: '100%' }}>
         <colgroup>
-          <col style={{ width: 130 }} />
-          <col style={{ width: 110 }} />
-          <col style={{ width: 110 }} />
-          <col style={{ width: 110 }} />
-          <col style={{ width: 70 }} />
+          <col style={{ width: 200 }} />
           <col />
+          <col />
+          <col />
+          <col style={{ width: 90 }} />
         </colgroup>
         <thead>
           <tr>
@@ -95,7 +94,6 @@ function KpiNumTable({
               </th>
             ))}
             <th>成長率<span style={{ display: 'block' }}>（％）</span></th>
-            <th>来期目標</th>
           </tr>
         </thead>
         <tbody>
@@ -115,15 +113,6 @@ function KpiNumTable({
               ))}
               <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
                 {calcGrowth(row.data.prev, row.data.actual)}
-              </td>
-              <td>
-                <textarea
-                  className="input"
-                  style={{ padding: '6px 8px', fontSize: '.8125rem', minHeight: 72, resize: 'vertical' }}
-                  value={row.data.nextTarget}
-                  onChange={e => onUpdate(i, 'nextTarget', e.target.value)}
-                  placeholder="自由記入"
-                />
               </td>
             </tr>
           ))}

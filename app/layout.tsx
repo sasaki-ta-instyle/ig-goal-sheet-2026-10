@@ -1,25 +1,10 @@
 import type { Metadata } from "next";
-import { Lato, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
-
-const lato = Lato({
-  weight: ['100', '300', '400', '700'],
-  subsets: ['latin'],
-  variable: '--font-lato',
-  display: 'swap',
-});
-
-const notoSansJP = Noto_Sans_JP({
-  weight: ['400', '500', '700'],
-  subsets: ['latin'],
-  variable: '--font-noto-sans-jp',
-  display: 'swap',
-});
 
 const SITE_URL = "https://app.instyle.group/instyle-goal-sheet-2026-10";
 const ASSETS = "https://app.instyle.group/_shared/static";
 const TITLE = "目標設定シート | INSTYLE GROUP";
-const DESCRIPTION = "INSTYLE GROUP 目標設定フォーム — 入力内容をPPTXで書き出します";
+const DESCRIPTION = "INSTYLE GROUP 目標設定フォーム — 入力内容をシェア用URLで共有します";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -52,7 +37,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${lato.variable} ${notoSansJP.variable}`}>
+    <html lang="ja">
+      <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/gen-interface-jp@0.5.0/all.css"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
