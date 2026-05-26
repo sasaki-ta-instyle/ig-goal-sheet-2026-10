@@ -254,7 +254,7 @@ export default function Home() {
               </h1>
               <p style={{ fontSize: '.8125rem', color: 'rgba(243,241,238,.45)' }}>
                 入力内容は自動保存されます。完成後はシェア用URLでオーナーに共有できます。<br />
-                来期のシート作成に備えて、完成後は「データを保存」（JSON形式）しておきましょう。来期は読み込むだけで引き継げます。
+                来期のシート作成に備えて、完成後は「データを書き出す」（JSON形式）しておきましょう。来期は読み込むだけで引き継げます。
               </p>
             </div>
             <div className="header-buttons" style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
@@ -282,7 +282,7 @@ export default function Home() {
                   cursor: 'pointer',
                 }}
               >
-                データを保存
+                データを書き出す
               </button>
               <button
                 onClick={handleReset}
