@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const SITE_URL = "https://app.instyle.group/instyle-goal-sheet-2026-10";
+const SITE_URL = "https://app.instyle.group/ig-goal-sheet-2026-10";
 const ASSETS = "https://app.instyle.group/_shared/static";
 const TITLE = "目標設定シート | INSTYLE GROUP";
 const DESCRIPTION = "INSTYLE GROUP 目標設定フォーム — 入力内容をシェア用URLで共有します";

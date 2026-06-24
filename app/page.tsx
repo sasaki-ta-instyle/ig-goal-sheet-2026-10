@@ -14,7 +14,7 @@ import BonusForm from '@/components/forms/BonusForm';
 import { createDefaultFormData, CURRENT_PERIOD, FormData, CommitmentRow, SmartGoalRow } from '@/lib/types';
 import { encodeFormData, buildShortShareUrl, buildLongShareUrl, baseFromPathname } from '@/lib/share-codec';
 
-const STORAGE_KEY = 'instyle-goal-sheet-2026-10-v1';
+const STORAGE_KEY = 'ig-goal-sheet-2026-10-v1';
 
 // 旧 SmartGoalRow（goal/targetValue/deadline/note）→ 新 SmartGoalRow（s/m/a/r/t/note）に
 // 写し替える。旧 goal→s、旧 targetValue→m、旧 deadline→t、note はそのまま。
