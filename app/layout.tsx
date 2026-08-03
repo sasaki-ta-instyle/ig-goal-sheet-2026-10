@@ -7,6 +7,7 @@ const TITLE = "目標設定シート | INSTYLE GROUP";
 const DESCRIPTION = "INSTYLE GROUP 目標設定フォーム — 入力内容をシェア用URLで共有します";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false, nocache: true },
   metadataBase: new URL(SITE_URL),
   title: TITLE,
   description: DESCRIPTION,
