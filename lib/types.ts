@@ -213,7 +213,7 @@ const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', actual: '' });
 const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', relatedKgi: '' });
 const emptyDeptKgi = (): DeptKgiRow => ({ mission: '', kgi: '' });
 
-export const CURRENT_PERIOD = '2026.10〜2027.3';
+export const CURRENT_PERIOD = '2026年10月-2027年3月期';
 
 export function createDefaultFormData(): FormData {
   return {
