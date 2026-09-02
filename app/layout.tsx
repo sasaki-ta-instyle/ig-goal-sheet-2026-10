@@ -3,7 +3,7 @@ import "./globals.css";
 
 const SITE_URL = "https://app.instyle.group/ig-goal-sheet-2026-10";
 const ASSETS = "https://app.instyle.group/_shared/static";
-const TITLE = "目標設定シート | INSTYLE GROUP";
+const TITLE = "目標設定シート 2026年10月-2027年3月期 | INSTYLE GROUP";
 const DESCRIPTION = "INSTYLE GROUP 目標設定フォーム — 入力内容をシェア用URLで共有します";
 
 export const metadata: Metadata = {
