@@ -17,7 +17,6 @@ export interface CompanyGoalData {
   revenue: KpiNumRow;
   operatingProfit: KpiNumRow;
   operatingMargin: KpiNumRow;
-  grossProfit: KpiNumRow;
   strategicFocus: string;
 }
 
@@ -222,14 +221,12 @@ export function createDefaultFormData(): FormData {
       revenue: emptyKpiNum(),
       operatingProfit: emptyKpiNum(),
       operatingMargin: emptyKpiNum(),
-      grossProfit: emptyKpiNum(),
       strategicFocus: '',
     },
     company: {
       revenue: emptyKpiNum(),
       operatingProfit: emptyKpiNum(),
       operatingMargin: emptyKpiNum(),
-      grossProfit: emptyKpiNum(),
       strategicFocus: '',
     },
     dept: {

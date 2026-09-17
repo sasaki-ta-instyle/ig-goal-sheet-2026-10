@@ -150,7 +150,7 @@ export default function CompanyGoalForm({
     }
   };
 
-  const updateProfitRow = (rowKey: 'operatingProfit' | 'operatingMargin' | 'grossProfit', field: keyof KpiNumRow, value: string) => {
+  const updateProfitRow = (rowKey: 'operatingProfit' | 'operatingMargin', field: keyof KpiNumRow, value: string) => {
     if (rowKey === 'operatingMargin' && isMarginNumericField(field)) return;
     if (rowKey === 'operatingProfit' && isMarginNumericField(field)) {
       const newProfit = { ...data.operatingProfit, [field]: value };
@@ -167,7 +167,6 @@ export default function CompanyGoalForm({
   const profitRows = [
     { label: `${labelPrefix}営業利益`, rowKey: 'operatingProfit' as const, readOnlyNumeric: false },
     { label: `${labelPrefix}営業利益率`, rowKey: 'operatingMargin' as const, readOnlyNumeric: true },
-    { label: `${labelPrefix}粗利益`, rowKey: 'grossProfit' as const, readOnlyNumeric: false },
   ];
 
   return (
