@@ -32,6 +32,7 @@ export interface DeptKpiNumRow {
   target: string;
   actual: string;
   relatedKgi?: '' | 'kgi1' | 'kgi2';
+  direction?: 'higher-better' | 'lower-better';
 }
 
 export interface DeptKgiRow {
@@ -120,6 +121,8 @@ export interface FormData {
   group: CompanyGoalData;
   company: CompanyGoalData;
   dept: DeptGoalData;
+  /** 兼部がある場合の 2 つ目の部署目標。未使用の人は空のまま。 */
+  dept2: DeptGoalData;
   personal: PersonalGoalData;
   promotion: PromotionData;
   bonus: BonusData;
@@ -209,7 +212,7 @@ export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flat
 );
 
 const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', actual: '' });
-const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', relatedKgi: '' });
+const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', relatedKgi: '', direction: 'higher-better' });
 const emptyDeptKgi = (): DeptKgiRow => ({ mission: '', kgi: '' });
 
 export const CURRENT_PERIOD = '2026年10月-2027年3月期';
@@ -230,6 +233,17 @@ export function createDefaultFormData(): FormData {
       strategicFocus: '',
     },
     dept: {
+      mission: '',
+      kgi1: emptyDeptKgi(),
+      kgi2: emptyDeptKgi(),
+      kpi1: emptyDeptKpiNum(),
+      kpi2: emptyDeptKpiNum(),
+      kpi3: emptyDeptKpiNum(),
+      kpi4: emptyDeptKpiNum(),
+      kpi5: emptyDeptKpiNum(),
+      actions: Array(4).fill(null).map(() => ({ content: '', expectedEffect: '', deadline: '' })),
+    },
+    dept2: {
       mission: '',
       kgi1: emptyDeptKgi(),
       kgi2: emptyDeptKgi(),

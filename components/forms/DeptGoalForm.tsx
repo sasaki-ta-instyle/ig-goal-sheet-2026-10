@@ -5,6 +5,7 @@ interface Props {
   data: DeptGoalData;
   onChange: (data: DeptGoalData) => void;
   companyStrategicFocus: string;
+  title?: string;
 }
 
 const autoComma = (v: string) => {
@@ -17,11 +18,12 @@ const autoComma = (v: string) => {
   return parts.join('.');
 };
 
-function calcGrowth(prev: string, actual: string): string {
+function calcGrowth(prev: string, actual: string, direction: 'higher-better' | 'lower-better' = 'higher-better'): string {
   const p = parseFloat(prev.replace(/,/g, ''));
   const a = parseFloat(actual.replace(/,/g, ''));
   if (!prev || !actual || isNaN(p) || isNaN(a) || p === 0) return '—';
-  const val = Math.round((a / p - 1) * 100);
+  let val = Math.round((a / p - 1) * 100);
+  if (direction === 'lower-better') val = -val;
   return `${val > 0 ? '+' : ''}${val}%`;
 }
 
@@ -43,7 +45,7 @@ const KPI_COLS: { key: 'prev' | 'target' | 'actual'; label: string; sub: string;
   { key: 'actual', label: '今期実績', sub: '2026年10月-2027年3月期', autoNumber: true },
 ];
 
-export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: Props) {
+export default function DeptGoalForm({ data, onChange, companyStrategicFocus, title = '03｜部署目標 記入シート' }: Props) {
   const set = <K extends keyof DeptGoalData>(key: K, value: DeptGoalData[K]) =>
     onChange({ ...data, [key]: value });
 
@@ -76,7 +78,7 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
 
   return (
     <div>
-      <p className="section-title">03｜部署目標 記入シート</p>
+      <p className="section-title">{title}</p>
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>① 上位目標との接続</p>
       <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 28 }}>
@@ -165,7 +167,13 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
               {KPI_COLS.map(c => (
                 <th key={c.key}>
                   {c.label}
-                  {c.sub && <span style={{ display: 'block', fontWeight: 400, fontSize: '.7rem', opacity: 0.7, whiteSpace: 'nowrap' }}>{c.sub}</span>}
+                  {c.sub && (
+                  <span style={{ display: 'block', fontWeight: 400, fontSize: '.7rem', opacity: 0.7 }}>
+                    {c.sub.split(/(?<=-)/).map((part, i) => (
+                      <span key={i} style={{ display: 'block' }}>{part}</span>
+                    ))}
+                  </span>
+                )}
                 </th>
               ))}
               <th style={{ whiteSpace: 'nowrap' }}>成長率（％）</th>
@@ -179,6 +187,7 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
                     <select
                       className="input"
                       style={{
+                        display: 'block',
                         marginTop: 6,
                         padding: '3px 6px',
                         fontSize: '.6875rem',
@@ -193,6 +202,24 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
                       <option value="">該当KGI 未選択</option>
                       <option value="kgi1">主要KGI①</option>
                       <option value="kgi2">主要KGI②</option>
+                    </select>
+                    <select
+                      className="input"
+                      style={{
+                        display: 'block',
+                        marginTop: 6,
+                        padding: '3px 6px',
+                        fontSize: '.6875rem',
+                        fontWeight: 500,
+                        width: '100%',
+                        color: 'var(--color-text-muted)',
+                      }}
+                      value={data[item.key].direction ?? 'higher-better'}
+                      onChange={e => updateKpi(item.key, 'direction', e.target.value as 'higher-better' | 'lower-better')}
+                      title="高い方が良いか低い方が良いか（成長率の符号に反映）"
+                    >
+                      <option value="higher-better">高い方が良い</option>
+                      <option value="lower-better">低い方が良い</option>
                     </select>
                   </td>
                   <td>
@@ -214,7 +241,7 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus }: 
                     </td>
                   ))}
                   <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-                    {calcGrowth(data[item.key].prev, data[item.key].actual)}
+                    {calcGrowth(data[item.key].prev, data[item.key].actual, data[item.key].direction ?? 'higher-better')}
                   </td>
                 </tr>
             ))}

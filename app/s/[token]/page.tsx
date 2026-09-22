@@ -33,6 +33,12 @@ function normalizeFormData(parsed: unknown): FormData | null {
       kgi1: { ...def.dept.kgi1, ...(p.dept?.kgi1 ?? {}) },
       kgi2: { ...def.dept.kgi2, ...(p.dept?.kgi2 ?? {}) },
     },
+    dept2: {
+      ...def.dept2,
+      ...(p.dept2 ?? {}),
+      kgi1: { ...def.dept2.kgi1, ...(p.dept2?.kgi1 ?? {}) },
+      kgi2: { ...def.dept2.kgi2, ...(p.dept2?.kgi2 ?? {}) },
+    },
     personal: { ...def.personal, ...(p.personal ?? {}) },
     promotion: { ...def.promotion, ...(p.promotion ?? {}) },
     bonus: { ...def.bonus, ...(p.bonus ?? {}) },

@@ -9,16 +9,29 @@ import CommitmentForm from '@/components/forms/CommitmentForm';
 import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
-import { FormData } from '@/lib/types';
+import { FormData, DeptGoalData } from '@/lib/types';
 import { baseFromPathname, buildShortShareUrl } from '@/lib/share-codec';
 
 const noop = () => {};
+
+// 兼部シートが空欄のまま（=兼部なしの人）なら閲覧画面には出さない。
+// mission/KGI/KPI/actions のいずれかに 1 文字でも入力があれば表示する。
+function hasDept2Content(d: DeptGoalData): boolean {
+  if (d.mission.trim()) return true;
+  if (d.kgi1.mission.trim() || d.kgi1.kgi.trim()) return true;
+  if (d.kgi2.mission.trim() || d.kgi2.kgi.trim()) return true;
+  const kpis = [d.kpi1, d.kpi2, d.kpi3, d.kpi4, d.kpi5];
+  if (kpis.some(k => k.label.trim() || k.prev.trim() || k.target.trim() || k.actual.trim())) return true;
+  if (d.actions.some(a => a.content.trim() || a.expectedEffect.trim() || a.deadline.trim())) return true;
+  return false;
+}
 
 const SECTIONS = [
   { id: 'top', label: 'トップ' },
   { id: 'group', label: 'グループ目標' },
   { id: 'company', label: '会社目標' },
   { id: 'dept', label: '部署目標' },
+  { id: 'dept2', label: '部署目標（兼部）' },
   { id: 'personal', label: '個人目標' },
   { id: 'commitment', label: 'ギャランティ' },
   { id: 'grade', label: 'グレード表' },
@@ -281,6 +294,9 @@ export default function ShareView({ data }: { data: FormData }) {
               />
             </Section>
             <Section id="dept"><DeptGoalForm data={data.dept} onChange={noop} companyStrategicFocus={data.company.strategicFocus} /></Section>
+            {hasDept2Content(data.dept2) && (
+              <Section id="dept2"><DeptGoalForm data={data.dept2} onChange={noop} companyStrategicFocus={data.company.strategicFocus} title="03-2｜部署目標（兼部がある場合）記入シート" /></Section>
+            )}
             <Section id="personal"><PersonalGoalForm data={data.personal} onChange={noop} /></Section>
             <Section id="commitment"><CommitmentForm data={data.personal} grade={data.cover.grade} onChange={noop} /></Section>
             <Section id="grade"><GradeForm selectedGrade={data.cover.grade} expectations={data.gradeExpectations} onChange={noop} /></Section>

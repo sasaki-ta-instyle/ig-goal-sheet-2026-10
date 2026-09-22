@@ -47,3 +47,6 @@ next-env.d.ts
 
 # conversation logs
 _conversation-logs/
+
+# personal draft answers (goal sheet fill-in scratchpad)
+_drafts/

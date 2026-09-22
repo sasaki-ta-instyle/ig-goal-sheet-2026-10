@@ -14,16 +14,28 @@ function truncate(s: string | undefined | null, n: number): string {
 }
 
 interface TierMeta {
-  step: number;
+  /** このタイルが担当するステップ番号。部署タイルは主部署(step 4) + 兼部(step 5) を兼ねる。 */
+  steps: number[];
   label: string;
 }
 
 const TIERS: TierMeta[] = [
-  { step: 2, label: 'グループ' },
-  { step: 3, label: '会社' },
-  { step: 4, label: '部署' },
-  { step: 5, label: '個人' },
+  { steps: [2], label: 'グループ' },
+  { steps: [3], label: '会社' },
+  { steps: [4, 5], label: '部署' },
+  { steps: [6], label: '個人' },
 ];
+
+// 兼部シートが空欄のままかどうか。空なら「部署」タイルには主部署だけ表示する。
+function hasDept2Content(d: FormData['dept2']): boolean {
+  if (d.mission.trim()) return true;
+  if (d.kgi1.mission.trim() || d.kgi1.kgi.trim()) return true;
+  if (d.kgi2.mission.trim() || d.kgi2.kgi.trim()) return true;
+  const kpis = [d.kpi1, d.kpi2, d.kpi3, d.kpi4, d.kpi5];
+  if (kpis.some(k => k.label.trim() || k.prev.trim() || k.target.trim() || k.actual.trim())) return true;
+  if (d.actions.some(a => a.content.trim() || a.expectedEffect.trim() || a.deadline.trim())) return true;
+  return false;
+}
 
 export default function GoalFunnel({ formData, currentStep }: Props) {
   // 個人タイルには「今期の役割・期待（自己認識）」を優先表示
@@ -31,12 +43,18 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
     formData.personal.currentStatus.find(s => s.label.includes('役割') || s.label.includes('期待'))?.value
     || '';
 
+  const deptSummary = truncate(formData.dept.mission || formData.dept.kgi1.kgi || formData.dept.kgi1.mission, 76);
+  const dept2Summary = hasDept2Content(formData.dept2)
+    ? truncate(formData.dept2.mission || formData.dept2.kgi1.kgi || formData.dept2.kgi1.mission, 76)
+    : '';
+
   // 入力済みの内容だけ表示。未入力ならプレースホルダーは出さない。
-  const summaries: Record<number, string> = {
-    2: truncate(formData.group.strategicFocus, 76),
-    3: truncate(formData.company.strategicFocus, 76),
-    4: truncate(formData.dept.mission || formData.dept.kgi1.kgi || formData.dept.kgi1.mission, 76),
-    5: truncate(personalSummary, 76),
+  // 部署タイルは主部署 + 兼部の 2 行を持てるように配列で保持。
+  const summaries: Record<number, string[]> = {
+    2: [truncate(formData.group.strategicFocus, 76)].filter(Boolean),
+    3: [truncate(formData.company.strategicFocus, 76)].filter(Boolean),
+    4: [deptSummary, dept2Summary].filter(Boolean),
+    6: [truncate(personalSummary, 76)].filter(Boolean),
   };
 
   return (
@@ -63,14 +81,17 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
         {TIERS.map((tier, i) => {
           // すり鉢状: 100% → 90% → 80% → 70%
           const widthPct = 100 - i * 10;
-          const isActive = currentStep === tier.step;
-          const isPast = currentStep > tier.step;
-          const isFuture = currentStep < tier.step;
+          const primaryStep = tier.steps[0];
+          const lastStep = tier.steps[tier.steps.length - 1];
+          const isActive = tier.steps.includes(currentStep);
+          const isPast = currentStep > lastStep;
+          const isFuture = currentStep < primaryStep;
           const taper = 4;
-          const summary = summaries[tier.step];
+          const summaryLines = summaries[primaryStep] ?? [];
+          const isDeptWithBoth = tier.label === '部署' && summaryLines.length > 1;
 
           return (
-            <div key={tier.step} style={{ width: '100%', position: 'relative' }}>
+            <div key={primaryStep} style={{ width: '100%', position: 'relative' }}>
               {i > 0 && (
                 <div
                   style={{
@@ -119,8 +140,9 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
                 >
                   {tier.label}
                 </p>
-                {summary && (
+                {summaryLines.map((line, li) => (
                   <p
+                    key={li}
                     style={{
                       fontSize: '.6875rem',
                       lineHeight: 1.55,
@@ -129,7 +151,7 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
                         : isPast
                         ? 'var(--color-text)'
                         : 'var(--color-text-muted)',
-                      margin: '6px 0 0',
+                      margin: li === 0 ? '6px 0 0' : '4px 0 0',
                       overflow: 'hidden',
                       display: '-webkit-box',
                       WebkitLineClamp: 3,
@@ -138,9 +160,14 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
                       textAlign: 'center',
                     }}
                   >
-                    {summary}
+                    {isDeptWithBoth && (
+                      <span style={{ fontWeight: 600, opacity: 0.6, marginRight: 4 }}>
+                        {li === 0 ? '主' : '兼'}：
+                      </span>
+                    )}
+                    {line}
                   </p>
-                )}
+                ))}
               </div>
             </div>
           );

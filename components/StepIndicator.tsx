@@ -5,12 +5,13 @@ const STEPS = [
   { num: 2, label: 'グループ目標' },
   { num: 3, label: '会社目標' },
   { num: 4, label: '部署目標' },
-  { num: 5, label: '個人目標' },
-  { num: 6, label: 'ギャランティ' },
-  { num: 7, label: 'グレード' },
-  { num: 8, label: '昇格評価' },
-  { num: 9, label: 'ボーナス' },
-  { num: 10, label: '確認・出力' },
+  { num: 5, label: '部署目標（兼部）' },
+  { num: 6, label: '個人目標' },
+  { num: 7, label: 'ギャランティ' },
+  { num: 8, label: 'グレード' },
+  { num: 9, label: '昇格評価' },
+  { num: 10, label: 'ボーナス' },
+  { num: 11, label: '確認・出力' },
 ];
 
 interface Props {
