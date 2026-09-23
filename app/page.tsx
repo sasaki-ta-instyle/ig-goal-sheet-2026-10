@@ -167,6 +167,19 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportDept2 = () => {
+    const payload = { _kind: 'dept2-only' as const, dept2: formData.dept2 };
+    const json = JSON.stringify(payload, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const period = formData.cover.period || '';
+    a.href = url;
+    a.download = `goal-sheet_部署目標-兼部_${period}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -187,6 +200,21 @@ export default function Home() {
             },
           }));
           alert('部署目標を取り込みました（他の入力はそのままです）。');
+          return;
+        }
+        // 「部署目標（兼部）だけ」の部分インポート：自分の入力は保持して dept2 のみ上書き
+        if (parsed && typeof parsed === 'object' && parsed._kind === 'dept2-only' && parsed.dept2) {
+          const def = createDefaultFormData();
+          setFormData(prev => ({
+            ...prev,
+            dept2: {
+              ...def.dept2,
+              ...parsed.dept2,
+              kgi1: { ...def.dept2.kgi1, ...(parsed.dept2.kgi1 ?? {}) },
+              kgi2: { ...def.dept2.kgi2, ...(parsed.dept2.kgi2 ?? {}) },
+            },
+          }));
+          alert('部署目標（兼部）を取り込みました（他の入力はそのままです）。');
           return;
         }
         // 通常の全体インポート
@@ -309,6 +337,13 @@ export default function Home() {
                 title="上長が部署目標だけを切り出して、配下のメンバーに配るためのエクスポート"
               >
                 部署目標を書き出す
+              </button>
+              <button
+                className="header-action"
+                onClick={handleExportDept2}
+                title="上長が部署目標（兼部）だけを切り出して、配下のメンバーに配るためのエクスポート"
+              >
+                部署目標（兼部）を書き出す
               </button>
               <button className="header-action" onClick={handleReset}>
                 入力をリセット
