@@ -11,6 +11,7 @@ import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
 import { FormData, DeptGoalData } from '@/lib/types';
 import { baseFromPathname, buildShortShareUrl } from '@/lib/share-codec';
+import { appendTokenHistory } from '@/lib/token-history';
 
 const noop = () => {};
 
@@ -39,7 +40,7 @@ const SECTIONS = [
   { id: 'bonus', label: 'ボーナス評価' },
 ];
 
-export default function ShareView({ data }: { data: FormData }) {
+export default function ShareView({ data, token, encoded }: { data: FormData; token?: string; encoded?: string }) {
   const cover = data.cover;
   const [activeId, setActiveId] = useState<string>('top');
   const [comment, setComment] = useState<string>(data.personal.supervisorComment ?? '');
@@ -47,6 +48,20 @@ export default function ShareView({ data }: { data: FormData }) {
   const [publishedUrl, setPublishedUrl] = useState('');
   const [publishedCopied, setPublishedCopied] = useState(false);
   const [publishError, setPublishError] = useState('');
+
+  const openPdf = () => {
+    const base = baseFromPathname(window.location.pathname);
+    let url = '';
+    if (token) {
+      url = `${window.location.origin}${base}/pdf/${token}?print=1`;
+    } else if (encoded) {
+      url = `${window.location.origin}${base}/pdf/share?d=${encoded}&print=1`;
+    } else {
+      return;
+    }
+    window.open(url, '_blank');
+  };
+  const canPdf = Boolean(token || encoded);
 
   const handlePublish = async () => {
     setPublishing(true);
@@ -65,9 +80,15 @@ export default function ShareView({ data }: { data: FormData }) {
         body: JSON.stringify(next),
       });
       if (!res.ok) throw new Error(`status ${res.status}`);
-      const { token } = (await res.json()) as { token?: string };
-      if (!token) throw new Error('no token');
-      const url = buildShortShareUrl(window.location.origin, window.location.pathname, token);
+      const { token: newToken } = (await res.json()) as { token?: string };
+      if (!newToken) throw new Error('no token');
+      const url = buildShortShareUrl(window.location.origin, window.location.pathname, newToken);
+      appendTokenHistory({
+        token: newToken,
+        name: cover.name,
+        period: cover.period,
+        kind: 'supervisor',
+      });
       setPublishedUrl(url);
       try {
         await navigator.clipboard.writeText(url);
@@ -210,6 +231,18 @@ export default function ShareView({ data }: { data: FormData }) {
                 {cover.company || '所属法人 未入力'}　／　{cover.name || '氏名 未入力'}　／　グレード {cover.grade || '—'}
               </p>
             </div>
+            {canPdf && (
+              <div className="share-print-btn" style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <button
+                  type="button"
+                  onClick={openPdf}
+                  className="header-action"
+                  title="4 ページ PDF（表紙／会社+部署／個人／グレード+ギャランティ+昇格+ボーナス）を新規タブで開き印刷ダイアログを起動します"
+                >
+                  📄 PDF で保存
+                </button>
+              </div>
+            )}
           </div>
         </header>
 

@@ -1,21 +1,18 @@
 import type { Metadata } from 'next';
-import ShareView, { ShareError } from '@/components/ShareView';
 import { readShare } from '@/lib/share-store';
 import { createDefaultFormData, CURRENT_PERIOD, FormData } from '@/lib/types';
+import PdfDocument from '@/components/pdf/PdfDocument';
+import PrintOnLoad from '@/components/pdf/PrintOnLoad';
+import PdfHint from '@/components/pdf/PdfHint';
+import BudouxApply from '@/components/pdf/BudouxApply';
+import './pdf.css';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: Promise<{ token: string }> }): Promise<Metadata> {
-  try {
-    const { token } = await params;
-    const raw = await readShare(token);
-    const name = ((raw as { cover?: { name?: string } } | null)?.cover?.name ?? '').trim();
-    if (!name) return { title: '目標設定シート 2026年10月-2027年3月期 | INSTYLE GROUP' };
-    return { title: `${name} | 目標設定シート 2026年10月-2027年3月期 | INSTYLE GROUP` };
-  } catch {
-    return { title: '目標設定シート 2026年10月-2027年3月期 | INSTYLE GROUP' };
-  }
-}
+export const metadata: Metadata = {
+  robots: { index: false, follow: false, nocache: true },
+  title: 'PDF 出力 | 目標設定シート 2026年10月-2027年3月期',
+};
 
 function normalizeFormData(parsed: unknown): FormData | null {
   if (!parsed || typeof parsed !== 'object') return null;
@@ -46,12 +43,37 @@ function normalizeFormData(parsed: unknown): FormData | null {
   };
 }
 
-export default async function ShareByTokenPage({ params }: { params: Promise<{ token: string }> }) {
+export default async function PdfByTokenPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ print?: string }>;
+}) {
   const { token } = await params;
+  const { print } = await searchParams;
   const raw = await readShare(token).catch(() => null);
   const data = normalizeFormData(raw);
+
   if (!data) {
-    return <ShareError message="シェアリンクが見つかりませんでした。発行者に再度生成してもらってください。" />;
+    return (
+      <main style={{ maxWidth: 720, margin: '0 auto', padding: '80px 24px' }}>
+        <div style={{ background: '#fff', padding: 32, borderRadius: 12, border: '1px solid #e0ddd2' }}>
+          <h1 style={{ fontSize: '1.25rem', marginBottom: 12 }}>シェアリンクを開けませんでした</h1>
+          <p style={{ fontSize: '.875rem', color: '#82837A' }}>
+            共有 token が見つかりません。発行元でもう一度 URL を発行してもらってください。
+          </p>
+        </div>
+      </main>
+    );
   }
-  return <ShareView data={data} token={token} />;
+
+  return (
+    <>
+      <PdfHint />
+      <PdfDocument data={data} />
+      <BudouxApply />
+      {print === '1' && <PrintOnLoad />}
+    </>
+  );
 }

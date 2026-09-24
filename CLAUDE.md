@@ -39,6 +39,22 @@ gh workflow run deploy-prod.yml --ref main
 gh run watch
 ```
 
+## 日次バックアップ（初回のみ手動セットアップ）
+
+`.share-store/` の JSON（短縮 URL の実体）を日次で `/var/backups/ig-goal-sheet/YYYY-MM-DD.tar.gz` に固めて 30 日保持する cron を、**初回のみ 1 回**サーバに仕込む。deploy 側で自動配置しない（cron の二重登録事故を避けるため）。
+
+```bash
+ssh conoha-root
+sudo install -m 0755 /var/www/app/ig-goal-sheet-2026-10/current/deploy/backup/ig-goal-sheet-backup.sh \
+  /etc/cron.daily/ig-goal-sheet-backup
+sudo mkdir -p /var/backups/ig-goal-sheet
+sudo run-parts --test /etc/cron.daily   # ig-goal-sheet-backup が並ぶこと
+sudo /etc/cron.daily/ig-goal-sheet-backup   # 手動で 1 回走らせて .tar.gz が出るか確認
+ls -lh /var/backups/ig-goal-sheet/
+```
+
+`.share-store/` のパスや保持日数を変えたい場合はスクリプト冒頭の `SRC` / `KEEP_DAYS` を編集して再 install する。
+
 ## ロールバック
 
 GitHub Actions 側のヘルスチェック失敗時は自動で前 release に戻る。手動で戻す場合:

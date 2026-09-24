@@ -13,6 +13,7 @@ import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
 import { createDefaultFormData, CURRENT_PERIOD, FormData, CommitmentRow, SmartGoalRow } from '@/lib/types';
 import { encodeFormData, buildShortShareUrl, buildLongShareUrl, baseFromPathname } from '@/lib/share-codec';
+import { appendTokenHistory } from '@/lib/token-history';
 
 const STORAGE_KEY = 'ig-goal-sheet-2026-10-v1';
 
@@ -266,6 +267,12 @@ export default function Home() {
         const { token } = (await res.json()) as { token?: string };
         if (token) {
           url = buildShortShareUrl(window.location.origin, window.location.pathname, token);
+          appendTokenHistory({
+            token,
+            name: cover.name,
+            period: cover.period,
+            kind: 'self',
+          });
         }
       }
     } catch {
@@ -345,6 +352,13 @@ export default function Home() {
               >
                 部署目標（兼部）を書き出す
               </button>
+              <a
+                className="header-action"
+                href={`${baseFromPathname(typeof window === 'undefined' ? '/ig-goal-sheet-2026-10/' : window.location.pathname)}/history`}
+                title="このブラウザで発行した短縮URLの履歴（最大50件）"
+              >
+                発行履歴
+              </a>
               <button className="header-action" onClick={handleReset}>
                 入力をリセット
               </button>

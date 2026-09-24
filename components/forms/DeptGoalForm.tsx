@@ -22,9 +22,11 @@ function calcGrowth(prev: string, actual: string, direction: 'higher-better' | '
   const p = parseFloat(prev.replace(/,/g, ''));
   const a = parseFloat(actual.replace(/,/g, ''));
   if (!prev || !actual || isNaN(p) || isNaN(a) || p === 0) return '—';
-  let val = Math.round((a / p - 1) * 100);
+  // 分母を絶対値にして、前期がマイナス（赤字）でも改善は +、悪化は - で素直に出す。
+  // lower-better は低い方が良い指標なので符号を反転して「改善なら +」に揃える。
+  let val = Math.round(((a - p) / Math.abs(p)) * 100);
   if (direction === 'lower-better') val = -val;
-  return `${val > 0 ? '+' : ''}${val}%`;
+  return `${val > 0 ? '+' : ''}${val}pt`;
 }
 
 function TI({ value, onChange, placeholder, autoNumber, compact }: { value: string; onChange: (v: string) => void; placeholder?: string; autoNumber?: boolean; compact?: boolean }) {
@@ -176,7 +178,7 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus, ti
                 )}
                 </th>
               ))}
-              <th style={{ whiteSpace: 'nowrap' }}>成長率（％）</th>
+              <th style={{ whiteSpace: 'nowrap' }}>成長率（ポイント）</th>
             </tr>
           </thead>
           <tbody>

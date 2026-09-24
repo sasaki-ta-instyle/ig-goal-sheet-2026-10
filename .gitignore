@@ -50,3 +50,12 @@ _conversation-logs/
 
 # personal draft answers (goal sheet fill-in scratchpad)
 _drafts/
+
+# Dropbox conflict artifacts (never commit)
+node_modules 2/
+.next 2/
+_conversation-logs 2/
+_dot-git-2-broken-*/
+
+# short-URL local storage (runtime, per-server)
+.share-store/
