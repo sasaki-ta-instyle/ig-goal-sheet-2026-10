@@ -106,9 +106,9 @@ function mergeFormData(parsed: unknown): FormData {
   };
 }
 
-// グループ〜ギャランティ までのサイドバー
+// 会社目標〜ギャランティ までのサイドバー
 function showFunnel(step: number): boolean {
-  return step >= 2 && step <= 7;
+  return step >= 2 && step <= 6;
 }
 
 export default function Home() {
@@ -233,11 +233,10 @@ export default function Home() {
   };
 
   const navigate = (s: number) => {
-    if (s >= 1 && s <= 11) setStep(s);
+    if (s >= 1 && s <= 10) setStep(s);
   };
 
   const updateCover = (d: FormData['cover']) => setFormData(prev => ({ ...prev, cover: d }));
-  const updateGroup = (d: FormData['group']) => setFormData(prev => ({ ...prev, group: d }));
   const updateCompany = (d: FormData['company']) => setFormData(prev => ({ ...prev, company: d }));
   const updateDept = (d: FormData['dept']) => setFormData(prev => ({ ...prev, dept: d }));
   const updateDept2 = (d: FormData['dept2']) => setFormData(prev => ({ ...prev, dept2: d }));
@@ -390,16 +389,15 @@ export default function Home() {
               {/* Form card */}
               <div className="glass-panel" style={{ marginBottom: 24 }}>
                 {step === 1 && <CoverForm data={formData.cover} onChange={updateCover} />}
-                {step === 2 && <CompanyGoalForm data={formData.group} onChange={updateGroup} title="01｜グループ目標 記入シート" labelPrefix="グループ" />}
-                {step === 3 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="02｜会社目標 記入シート" labelPrefix="会社" parentStrategicFocus={formData.group.strategicFocus} parentLabelPrefix="グループ" />}
-                {step === 4 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
-                {step === 5 && <DeptGoalForm data={formData.dept2} onChange={updateDept2} companyStrategicFocus={formData.company.strategicFocus} title="03-2｜部署目標（兼部がある場合）記入シート" />}
-                {step === 6 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
-                {step === 7 && <CommitmentForm data={formData.personal} grade={formData.cover.grade} onChange={updatePersonal} />}
-                {step === 8 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
-                {step === 9 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
-                {step === 10 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
-                {step === 11 && <ConfirmView data={formData} />}
+                {step === 2 && <CompanyGoalForm data={formData.company} onChange={updateCompany} title="01｜会社目標 記入シート" labelPrefix="会社" />}
+                {step === 3 && <DeptGoalForm data={formData.dept} onChange={updateDept} companyStrategicFocus={formData.company.strategicFocus} />}
+                {step === 4 && <DeptGoalForm data={formData.dept2} onChange={updateDept2} companyStrategicFocus={formData.company.strategicFocus} title="02-2｜部署目標（兼部がある場合）記入シート" />}
+                {step === 5 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
+                {step === 6 && <CommitmentForm data={formData.personal} grade={formData.cover.grade} onChange={updatePersonal} />}
+                {step === 7 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
+                {step === 8 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
+                {step === 9 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
+                {step === 10 && <ConfirmView data={formData} />}
               </div>
 
               {/* Navigation buttons */}
@@ -412,7 +410,7 @@ export default function Home() {
                   ← 前へ
                 </button>
 
-                {step < 11 ? (
+                {step < 10 ? (
                   <button
                     className="btn btn-primary"
                     onClick={() => navigate(step + 1)}
@@ -436,7 +434,7 @@ export default function Home() {
                 )}
               </div>
 
-              {shareUrl && step === 11 && (
+              {shareUrl && step === 10 && (
                 <div style={{
                   marginTop: 20,
                   padding: '16px 20px',
@@ -585,7 +583,7 @@ function ConfirmView({ data }: { data: FormData }) {
       }}>
         <strong style={{ color: 'var(--color-text)' }}>共有されるセクション：</strong>
         <br />
-        1. カバー &nbsp; 2. グループ目標 &nbsp; 3. 会社目標 &nbsp; 4. 部署目標 &nbsp; 5. 部署目標（兼部） &nbsp; 6. 個人目標 &nbsp; 7. ギャランティ &nbsp; 8. グレード表 &nbsp; 9. 昇格・昇給採点 &nbsp; 10. ボーナス評価採点
+        1. カバー &nbsp; 2. 会社目標 &nbsp; 3. 部署目標 &nbsp; 4. 部署目標（兼部） &nbsp; 5. 個人目標 &nbsp; 6. ギャランティ &nbsp; 7. グレード表 &nbsp; 8. 昇格・昇給採点 &nbsp; 9. ボーナス評価採点
       </div>
     </div>
   );

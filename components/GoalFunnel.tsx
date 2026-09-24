@@ -20,10 +20,9 @@ interface TierMeta {
 }
 
 const TIERS: TierMeta[] = [
-  { steps: [2], label: 'グループ' },
-  { steps: [3], label: '会社' },
-  { steps: [4, 5], label: '部署' },
-  { steps: [6], label: '個人' },
+  { steps: [2], label: '会社' },
+  { steps: [3, 4], label: '部署' },
+  { steps: [5], label: '個人' },
 ];
 
 // 兼部シートが空欄のままかどうか。空なら「部署」タイルには主部署だけ表示する。
@@ -51,10 +50,9 @@ export default function GoalFunnel({ formData, currentStep }: Props) {
   // 入力済みの内容だけ表示。未入力ならプレースホルダーは出さない。
   // 部署タイルは主部署 + 兼部の 2 行を持てるように配列で保持。
   const summaries: Record<number, string[]> = {
-    2: [truncate(formData.group.strategicFocus, 76)].filter(Boolean),
-    3: [truncate(formData.company.strategicFocus, 76)].filter(Boolean),
-    4: [deptSummary, dept2Summary].filter(Boolean),
-    6: [truncate(personalSummary, 76)].filter(Boolean),
+    2: [truncate(formData.company.strategicFocus, 76)].filter(Boolean),
+    3: [deptSummary, dept2Summary].filter(Boolean),
+    5: [truncate(personalSummary, 76)].filter(Boolean),
   };
 
   return (

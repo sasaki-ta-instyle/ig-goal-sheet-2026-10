@@ -47,7 +47,7 @@ const KPI_COLS: { key: 'prev' | 'target' | 'actual'; label: string; sub: string;
   { key: 'actual', label: '今期実績', sub: '2026年10月-2027年3月期', autoNumber: true },
 ];
 
-export default function DeptGoalForm({ data, onChange, companyStrategicFocus, title = '03｜部署目標 記入シート' }: Props) {
+export default function DeptGoalForm({ data, onChange, companyStrategicFocus, title = '02｜部署目標 記入シート' }: Props) {
   const set = <K extends keyof DeptGoalData>(key: K, value: DeptGoalData[K]) =>
     onChange({ ...data, [key]: value });
 

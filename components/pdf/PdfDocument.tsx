@@ -172,7 +172,7 @@ function CompanyDeptPage({ data }: { data: FormData }) {
   const dept2 = hasDeptContent(data.dept2);
   return (
     <section className="pdf-page">
-      <h2 className="pdf-page-title">02｜会社目標 &amp; 03｜部署目標</h2>
+      <h2 className="pdf-page-title">01｜会社目標 &amp; 02｜部署目標</h2>
       <p className="pdf-page-lede">会社の骨太と、そこにぶら下がる部署ミッション・KGI・KPI。</p>
       <div className={dept2 ? 'pdf-grid-quad' : 'pdf-grid-2'}>
         <CompanyGoalCard data={data.company} title="会社目標" />
@@ -196,7 +196,7 @@ function PersonalGoalPage({ data }: { data: FormData }) {
   };
   return (
     <section className="pdf-page">
-      <h2 className="pdf-page-title">04｜個人目標</h2>
+      <h2 className="pdf-page-title">03｜個人目標</h2>
       <p className="pdf-page-lede">現在地 → SMART 目標 → SL 理論 → 上長からの一言。</p>
       <div className="pdf-grid-2" style={{ gridTemplateColumns: '1fr 1fr' }}>
         {/* Left: 現在地 + SL */}
@@ -274,7 +274,7 @@ function GradeCard({ grade, expectations }: { grade: string; expectations: Grade
   const tier = GRADE_TABLE.find(t => t.grades.some(g => g.key === grade));
   return (
     <div className="pdf-card">
-      <p className="pdf-card-heading">08｜グレード</p>
+      <p className="pdf-card-heading">05｜グレード</p>
       <div className="pdf-card-body">
         <p style={{ fontSize: '1.75rem', fontWeight: 700, fontFamily: 'var(--font-display)', marginBottom: 4 }}>
           {grade || '—'}
@@ -307,7 +307,7 @@ function CommitmentCard({ commitment }: { commitment: CommitmentRow[] }) {
   const filled = commitment.filter(r => (r.amount || '').trim() || (r.rationale || '').trim());
   return (
     <div className="pdf-card">
-      <p className="pdf-card-heading">05｜ギャランティ（貢献の中身）</p>
+      <p className="pdf-card-heading">04｜ギャランティ（貢献の中身）</p>
       <div className="pdf-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div className="pdf-stat">
           <span className="pdf-stat-num">{fmtMoney(total)}</span>
@@ -354,7 +354,7 @@ function PromotionCard({ data }: { data: PromotionData }) {
         : `${total}pt（あと ${11 - total}pt）`;
   return (
     <div className="pdf-card">
-      <p className="pdf-card-heading">09｜昇格・昇給採点</p>
+      <p className="pdf-card-heading">06｜昇格・昇給採点</p>
       <div className="pdf-card-body">
         <div className="pdf-stat">
           <span className="pdf-stat-num">{total}</span>
@@ -388,7 +388,7 @@ function BonusCard({ data }: { data: BonusData }) {
   const payout = phase1 >= 3 ? (phase1 + phase2) * 110000 : 0;
   return (
     <div className="pdf-card">
-      <p className="pdf-card-heading">10｜ボーナス評価採点</p>
+      <p className="pdf-card-heading">07｜ボーナス評価採点</p>
       <div className="pdf-card-body">
         <div className="pdf-stat">
           <span className="pdf-stat-num">{fmtMoney(payout)}</span>
@@ -418,7 +418,7 @@ function BonusCard({ data }: { data: BonusData }) {
 function GradeGuarantyPage({ data }: { data: FormData }) {
   return (
     <section className="pdf-page">
-      <h2 className="pdf-page-title">05〜10｜グレード・ギャランティ・昇格・ボーナス</h2>
+      <h2 className="pdf-page-title">04〜07｜ギャランティ・グレード・昇格・ボーナス</h2>
       <p className="pdf-page-lede">今期のポジションと対価の全体像。</p>
       <div className="pdf-grid-quad">
         <GradeCard grade={data.cover.grade} expectations={data.gradeExpectations} />

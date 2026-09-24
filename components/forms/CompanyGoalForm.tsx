@@ -127,7 +127,7 @@ function KpiNumTable({
 export default function CompanyGoalForm({
   data,
   onChange,
-  title = '02｜会社目標 記入シート',
+  title = '01｜会社目標 記入シート',
   labelPrefix = '会社',
   parentStrategicFocus,
   parentLabelPrefix,

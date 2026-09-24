@@ -29,7 +29,6 @@ function hasDept2Content(d: DeptGoalData): boolean {
 
 const SECTIONS = [
   { id: 'top', label: 'トップ' },
-  { id: 'group', label: 'グループ目標' },
   { id: 'company', label: '会社目標' },
   { id: 'dept', label: '部署目標' },
   { id: 'dept2', label: '部署目標（兼部）' },
@@ -315,20 +314,17 @@ export default function ShareView({ data, token, encoded }: { data: FormData; to
         <main className="share-view" style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 24px 80px' }}>
           <fieldset disabled style={{ border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
             <Section id="cover"><CoverForm data={data.cover} onChange={noop} /></Section>
-            <Section id="group"><CompanyGoalForm data={data.group} onChange={noop} title="01｜グループ目標 記入シート" labelPrefix="グループ" /></Section>
             <Section id="company">
               <CompanyGoalForm
                 data={data.company}
                 onChange={noop}
-                title="02｜会社目標 記入シート"
+                title="01｜会社目標 記入シート"
                 labelPrefix="会社"
-                parentStrategicFocus={data.group.strategicFocus}
-                parentLabelPrefix="グループ"
               />
             </Section>
             <Section id="dept"><DeptGoalForm data={data.dept} onChange={noop} companyStrategicFocus={data.company.strategicFocus} /></Section>
             {hasDept2Content(data.dept2) && (
-              <Section id="dept2"><DeptGoalForm data={data.dept2} onChange={noop} companyStrategicFocus={data.company.strategicFocus} title="03-2｜部署目標（兼部がある場合）記入シート" /></Section>
+              <Section id="dept2"><DeptGoalForm data={data.dept2} onChange={noop} companyStrategicFocus={data.company.strategicFocus} title="02-2｜部署目標（兼部がある場合）記入シート" /></Section>
             )}
             <Section id="personal"><PersonalGoalForm data={data.personal} onChange={noop} /></Section>
             <Section id="commitment"><CommitmentForm data={data.personal} grade={data.cover.grade} onChange={noop} /></Section>
