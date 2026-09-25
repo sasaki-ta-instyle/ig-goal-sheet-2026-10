@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { readTokenHistory, TokenHistoryEntry } from '@/lib/token-history';
+import {
+  readTokenHistory,
+  removeTokenHistory,
+  clearTokenHistory,
+  TokenHistoryEntry,
+} from '@/lib/token-history';
 import { baseFromPathname } from '@/lib/share-codec';
 
 const KIND_LABEL: Record<TokenHistoryEntry['kind'], string> = {
@@ -23,6 +28,18 @@ export default function HistoryPage() {
     setEntries(readTokenHistory());
     setBase(baseFromPathname(window.location.pathname));
   }, []);
+
+  const handleRemove = (token: string, name: string) => {
+    if (!confirm(`「${name || '（未入力）'}」の履歴を削除しますか？（発行済み URL 自体は残りますが、この一覧から消えます）`)) return;
+    removeTokenHistory(token);
+    setEntries(readTokenHistory());
+  };
+
+  const handleClearAll = () => {
+    if (!confirm('履歴を全て削除しますか？（発行済み URL 自体は残りますが、この一覧から全て消えます）')) return;
+    clearTokenHistory();
+    setEntries(readTokenHistory());
+  };
 
   return (
     <>
@@ -56,12 +73,24 @@ export default function HistoryPage() {
                 発行履歴
               </h1>
               <p style={{ fontSize: '.8125rem', color: 'rgba(243,241,238,.55)' }}>
-                このブラウザで発行した短縮 URL の履歴です（最大 50 件・古いものから消えます）。ブラウザを変えたり履歴を消すと失われます。
+                このブラウザで発行した短縮 URL の履歴です（最大 50 件・古い順に落ち、発行から 30 日で自動失効）。ブラウザを変えたり履歴を消すと失われます。
               </p>
             </div>
-            <a href={base ? `${base}/` : '/'} className="header-action">
-              ← 入力画面に戻る
-            </a>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {entries && entries.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearAll}
+                  className="header-action"
+                  title="この一覧を全て削除（発行済み URL 自体は残ります）"
+                >
+                  🗑 履歴を全削除
+                </button>
+              )}
+              <a href={base ? `${base}/` : '/'} className="header-action">
+                ← 入力画面に戻る
+              </a>
+            </div>
           </div>
         </header>
         <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 24px 80px' }}>
@@ -82,7 +111,8 @@ export default function HistoryPage() {
                       <th style={{ width: 90 }}>種別</th>
                       <th>氏名</th>
                       <th style={{ width: 200 }}>期</th>
-                      <th style={{ width: 220 }}>リンク</th>
+                      <th style={{ width: 180 }}>リンク</th>
+                      <th style={{ width: 70 }}></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -130,6 +160,25 @@ export default function HistoryPage() {
                                 PDF
                               </a>
                             </div>
+                          </td>
+                          <td style={{ fontSize: '.6875rem', textAlign: 'right' }}>
+                            <button
+                              type="button"
+                              onClick={() => handleRemove(e.token, e.name)}
+                              title="この履歴を削除（URL 自体は残ります）"
+                              style={{
+                                background: 'transparent',
+                                border: '1px solid rgba(220, 38, 38, 0.30)',
+                                color: 'var(--color-error)',
+                                borderRadius: 999,
+                                padding: '2px 10px',
+                                cursor: 'pointer',
+                                fontFamily: 'inherit',
+                                fontSize: '.6875rem',
+                              }}
+                            >
+                              削除
+                            </button>
                           </td>
                         </tr>
                       );

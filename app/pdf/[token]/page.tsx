@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { readShare } from '@/lib/share-store';
-import { createDefaultFormData, CURRENT_PERIOD, FormData } from '@/lib/types';
 import PdfDocument from '@/components/pdf/PdfDocument';
 import PrintOnLoad from '@/components/pdf/PrintOnLoad';
 import PdfHint from '@/components/pdf/PdfHint';
 import BudouxApply from '@/components/pdf/BudouxApply';
+import { mergeFormData } from '@/lib/normalize-form-data';
 import './pdf.css';
 
 export const dynamic = 'force-dynamic';
@@ -13,35 +13,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
   title: 'PDF 出力 | 目標設定シート 2026年10月-2027年3月期',
 };
-
-function normalizeFormData(parsed: unknown): FormData | null {
-  if (!parsed || typeof parsed !== 'object') return null;
-  const def = createDefaultFormData();
-  const p = parsed as Partial<FormData>;
-  return {
-    ...def,
-    ...p,
-    cover: { ...def.cover, ...(p.cover ?? {}), period: p.cover?.period ?? CURRENT_PERIOD },
-    group: { ...def.group, ...(p.group ?? {}) },
-    company: { ...def.company, ...(p.company ?? {}) },
-    dept: {
-      ...def.dept,
-      ...(p.dept ?? {}),
-      kgi1: { ...def.dept.kgi1, ...(p.dept?.kgi1 ?? {}) },
-      kgi2: { ...def.dept.kgi2, ...(p.dept?.kgi2 ?? {}) },
-    },
-    dept2: {
-      ...def.dept2,
-      ...(p.dept2 ?? {}),
-      kgi1: { ...def.dept2.kgi1, ...(p.dept2?.kgi1 ?? {}) },
-      kgi2: { ...def.dept2.kgi2, ...(p.dept2?.kgi2 ?? {}) },
-    },
-    personal: { ...def.personal, ...(p.personal ?? {}) },
-    promotion: { ...def.promotion, ...(p.promotion ?? {}) },
-    bonus: { ...def.bonus, ...(p.bonus ?? {}) },
-    gradeExpectations: { ...def.gradeExpectations, ...(p.gradeExpectations ?? {}) },
-  };
-}
 
 export default async function PdfByTokenPage({
   params,
@@ -53,7 +24,9 @@ export default async function PdfByTokenPage({
   const { token } = await params;
   const { print } = await searchParams;
   const raw = await readShare(token).catch(() => null);
-  const data = normalizeFormData(raw);
+  const data = raw
+    ? mergeFormData(raw, { forceCurrentPeriod: false, finalized: 'preserve' })
+    : null;
 
   if (!data) {
     return (

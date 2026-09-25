@@ -11,99 +11,17 @@ import CommitmentForm from '@/components/forms/CommitmentForm';
 import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
-import { createDefaultFormData, CURRENT_PERIOD, FormData, CommitmentRow, SmartGoalRow } from '@/lib/types';
+import { createDefaultFormData, FormData } from '@/lib/types';
 import { encodeFormData, buildShortShareUrl, buildLongShareUrl, baseFromPathname } from '@/lib/share-codec';
 import { appendTokenHistory } from '@/lib/token-history';
+import { mergeFormData as sharedMergeFormData } from '@/lib/normalize-form-data';
 
 const STORAGE_KEY = 'ig-goal-sheet-2026-10-v1';
 
-// 旧 SmartGoalRow（goal/targetValue/deadline/note）→ 新 SmartGoalRow（s/m/a/r/t/note）に
-// 写し替える。旧 goal→s、旧 targetValue→m、旧 deadline→t、note はそのまま。
-// 配列長は新デフォルト（3 件）に揃え、不足は空行で補完、超過は切り捨て。
-type LegacySmartGoalRow = Partial<SmartGoalRow> & {
-  goal?: string;
-  targetValue?: string;
-  deadline?: string;
-};
-function normalizeSmartGoals(input: unknown, defaults: SmartGoalRow[]): SmartGoalRow[] {
-  if (!Array.isArray(input)) return defaults;
-  return defaults.map((def, i) => {
-    const raw = input[i] as LegacySmartGoalRow | undefined;
-    if (!raw || typeof raw !== 'object') return def;
-    return {
-      relatedKpi: (raw as { relatedKpi?: string }).relatedKpi ?? '',
-      s: raw.s ?? raw.goal ?? '',
-      m: raw.m ?? raw.targetValue ?? '',
-      a: raw.a ?? '',
-      r: raw.r ?? '',
-      t: raw.t ?? raw.deadline ?? '',
-      note: raw.note ?? '',
-    };
-  });
-}
-
-// 旧 JSON / localStorage 取り込み時のフォールバック。
-// 旧仕様（買い手×3：会社／グループ／西村さん）の label フィールドは新仕様で型から
-// 削除済みで、自然に捨てられる。amount / rationale だけを引き継ぐ。
-// 行数はデフォルト（3 行固定）を基準にマップし、超過分は意図的に切り捨てる。
-function normalizeCommitment(input: unknown, defaults: CommitmentRow[]): CommitmentRow[] {
-  if (!Array.isArray(input)) return defaults;
-  return defaults.map((def, i) => {
-    const raw = input[i] as Partial<CommitmentRow> | undefined;
-    if (!raw || typeof raw !== 'object') return def;
-    const rawAmount = raw.amount !== undefined && raw.amount !== null ? String(raw.amount) : '';
-    return {
-      amount: rawAmount.replace(/[^\d]/g, ''),
-      rationale: typeof raw.rationale === 'string' ? raw.rationale : '',
-    };
-  });
-}
-
-// 旧バージョンの JSON / localStorage を読み込んだ場合に新フィールドが undefined になり
-// 下流のレンダリングや PPTX 生成が落ちるのを防ぐ正規化ヘルパ。
-// cover.period は常に当期に強制する（4月版エクスポートを 10月版にインポートしたケース対応）。
+// 本人フォーム側の import 経路。当期に強制上書きし、
+// 上長版 JSON を引き継いだときに finalized=true が残らないよう明示 reset する。
 function mergeFormData(parsed: unknown): FormData {
-  const def = createDefaultFormData();
-  if (!parsed || typeof parsed !== 'object') return def;
-  const p = parsed as Partial<FormData>;
-  return {
-    ...def,
-    ...p,
-    cover: { ...def.cover, ...(p.cover ?? {}), period: CURRENT_PERIOD },
-    group: { ...def.group, ...(p.group ?? {}) },
-    company: { ...def.company, ...(p.company ?? {}) },
-    dept: {
-      ...def.dept,
-      ...(p.dept ?? {}),
-      kgi1: { ...def.dept.kgi1, ...(p.dept?.kgi1 ?? {}) },
-      kgi2: { ...def.dept.kgi2, ...(p.dept?.kgi2 ?? {}) },
-    },
-    dept2: {
-      ...def.dept2,
-      ...(p.dept2 ?? {}),
-      kgi1: { ...def.dept2.kgi1, ...(p.dept2?.kgi1 ?? {}) },
-      kgi2: { ...def.dept2.kgi2, ...(p.dept2?.kgi2 ?? {}) },
-    },
-    personal: {
-      ...def.personal,
-      ...(p.personal ?? {}),
-      smartGoals: normalizeSmartGoals(p.personal?.smartGoals, def.personal.smartGoals),
-      commitment: normalizeCommitment(
-        (() => {
-          const personal = p.personal as
-            | { commitment?: unknown; marketValue?: unknown }
-            | undefined;
-          const current = personal?.commitment;
-          if (Array.isArray(current) && current.length > 0) return current;
-          return personal?.marketValue;
-        })(),
-        def.personal.commitment,
-      ),
-    },
-    promotion: { ...def.promotion, ...(p.promotion ?? {}) },
-    bonus: { ...def.bonus, ...(p.bonus ?? {}) },
-    gradeExpectations: { ...def.gradeExpectations, ...(p.gradeExpectations ?? {}) },
-  };
+  return sharedMergeFormData(parsed, { forceCurrentPeriod: true, finalized: 'reset' });
 }
 
 // 会社目標〜ギャランティ までのサイドバー

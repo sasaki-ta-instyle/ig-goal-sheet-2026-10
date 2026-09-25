@@ -53,7 +53,7 @@ sudo /etc/cron.daily/ig-goal-sheet-backup   # 手動で 1 回走らせて .tar.g
 ls -lh /var/backups/ig-goal-sheet/
 ```
 
-`.share-store/` のパスや保持日数を変えたい場合はスクリプト冒頭の `SRC` / `KEEP_DAYS` を編集して再 install する。
+`.share-store/` の実パスは `/var/www/_shared/apps/app-ig-goal-sheet-2026-10.env` の `SHARE_STORE_DIR` から自動読み取り（現行値: `/var/www/_shared/apps/app-instyle-goal-sheet-2026-10-shares`、旧命名のまま）。env の値を変えれば backup 側も追従するので、script は再 install 不要。保持日数だけ変えたければ script 冒頭の `KEEP_DAYS` を編集。
 
 ## ロールバック
 
