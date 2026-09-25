@@ -22,7 +22,7 @@ function hasDept2Content(d: DeptGoalData): boolean {
   if (d.kgi1.mission.trim() || d.kgi1.kgi.trim()) return true;
   if (d.kgi2.mission.trim() || d.kgi2.kgi.trim()) return true;
   const kpis = [d.kpi1, d.kpi2, d.kpi3, d.kpi4, d.kpi5];
-  if (kpis.some(k => k.label.trim() || k.prev.trim() || k.target.trim() || k.actual.trim())) return true;
+  if (kpis.some(k => k.label.trim() || k.target.trim() || k.actual.trim())) return true;
   if (d.actions.some(a => a.content.trim() || a.expectedEffect.trim() || a.deadline.trim())) return true;
   return false;
 }

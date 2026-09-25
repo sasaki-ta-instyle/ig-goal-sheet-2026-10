@@ -18,17 +18,6 @@ const autoComma = (v: string) => {
   return parts.join('.');
 };
 
-function calcGrowth(prev: string, actual: string, direction: 'higher-better' | 'lower-better' = 'higher-better'): string {
-  const p = parseFloat(prev.replace(/,/g, ''));
-  const a = parseFloat(actual.replace(/,/g, ''));
-  if (!prev || !actual || isNaN(p) || isNaN(a) || p === 0) return '—';
-  // 分母を絶対値にして、前期がマイナス（赤字）でも改善は +、悪化は - で素直に出す。
-  // lower-better は低い方が良い指標なので符号を反転して「改善なら +」に揃える。
-  let val = Math.round(((a - p) / Math.abs(p)) * 100);
-  if (direction === 'lower-better') val = -val;
-  return `${val > 0 ? '+' : ''}${val}pt`;
-}
-
 function TI({ value, onChange, placeholder, autoNumber, compact }: { value: string; onChange: (v: string) => void; placeholder?: string; autoNumber?: boolean; compact?: boolean }) {
   return (
     <input
@@ -41,8 +30,7 @@ function TI({ value, onChange, placeholder, autoNumber, compact }: { value: stri
   );
 }
 
-const KPI_COLS: { key: 'prev' | 'target' | 'actual'; label: string; sub: string; autoNumber?: boolean }[] = [
-  { key: 'prev', label: '前期実績', sub: '2026年4月-9月期', autoNumber: true },
+const KPI_COLS: { key: 'target' | 'actual'; label: string; sub: string; autoNumber?: boolean }[] = [
   { key: 'target', label: '今期目標', sub: '2026年10月-2027年3月期', autoNumber: true },
   { key: 'actual', label: '今期実績', sub: '2026年10月-2027年3月期', autoNumber: true },
 ];
@@ -157,10 +145,8 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus, ti
           <colgroup>
             <col style={{ width: 130 }} />
             <col />
-            <col style={{ width: 120 }} />
-            <col style={{ width: 120 }} />
-            <col style={{ width: 120 }} />
-            <col style={{ width: 120 }} />
+            <col style={{ width: 140 }} />
+            <col style={{ width: 140 }} />
           </colgroup>
           <thead>
             <tr>
@@ -178,7 +164,6 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus, ti
                 )}
                 </th>
               ))}
-              <th style={{ whiteSpace: 'nowrap' }}>成長率（ポイント）</th>
             </tr>
           </thead>
           <tbody>
@@ -205,24 +190,6 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus, ti
                       <option value="kgi1">主要KGI①</option>
                       <option value="kgi2">主要KGI②</option>
                     </select>
-                    <select
-                      className="input"
-                      style={{
-                        display: 'block',
-                        marginTop: 6,
-                        padding: '3px 6px',
-                        fontSize: '.6875rem',
-                        fontWeight: 500,
-                        width: '100%',
-                        color: 'var(--color-text-muted)',
-                      }}
-                      value={data[item.key].direction ?? 'higher-better'}
-                      onChange={e => updateKpi(item.key, 'direction', e.target.value as 'higher-better' | 'lower-better')}
-                      title="高い方が良いか低い方が良いか（成長率の符号に反映）"
-                    >
-                      <option value="higher-better">高い方が良い</option>
-                      <option value="lower-better">低い方が良い</option>
-                    </select>
                   </td>
                   <td>
                     <TI
@@ -242,9 +209,6 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus, ti
                       />
                     </td>
                   ))}
-                  <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-                    {calcGrowth(data[item.key].prev, data[item.key].actual, data[item.key].direction ?? 'higher-better')}
-                  </td>
                 </tr>
             ))}
           </tbody>

@@ -27,7 +27,7 @@ function hasDeptContent(d: DeptGoalData): boolean {
   if (d.kgi1.mission.trim() || d.kgi1.kgi.trim()) return true;
   if (d.kgi2.mission.trim() || d.kgi2.kgi.trim()) return true;
   const kpis = [d.kpi1, d.kpi2, d.kpi3, d.kpi4, d.kpi5];
-  if (kpis.some(k => k.label.trim() || k.prev.trim() || k.target.trim() || k.actual.trim())) return true;
+  if (kpis.some(k => k.label.trim() || k.target.trim() || k.actual.trim())) return true;
   if (d.actions.some(a => a.content.trim() || a.expectedEffect.trim() || a.deadline.trim())) return true;
   return false;
 }
@@ -145,7 +145,6 @@ function DeptGoalCard({ data, title }: { data: DeptGoalData; title: string }) {
             <thead>
               <tr>
                 <th>KPI</th>
-                <th className="num">前期</th>
                 <th className="num">目標</th>
                 <th className="num">実績</th>
               </tr>
@@ -154,7 +153,6 @@ function DeptGoalCard({ data, title }: { data: DeptGoalData; title: string }) {
               {kpis.map((k, i) => (
                 <tr key={i}>
                   <td>{textOrDash(k.label)}</td>
-                  <td className="num">{textOrDash(k.prev)}</td>
                   <td className="num">{textOrDash(k.target)}</td>
                   <td className="num">{textOrDash(k.actual)}</td>
                 </tr>
