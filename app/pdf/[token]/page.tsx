@@ -4,6 +4,8 @@ import PdfDocument from '@/components/pdf/PdfDocument';
 import PrintOnLoad from '@/components/pdf/PrintOnLoad';
 import PdfHint from '@/components/pdf/PdfHint';
 import BudouxApply from '@/components/pdf/BudouxApply';
+import OwnerUrlLink from '@/components/pdf/OwnerUrlLink';
+import OwnerUrlPill from '@/components/pdf/OwnerUrlPill';
 import { mergeFormData } from '@/lib/normalize-form-data';
 import './pdf.css';
 
@@ -44,7 +46,11 @@ export default async function PdfByTokenPage({
   return (
     <>
       <PdfHint />
-      <PdfDocument data={data} />
+      <PdfDocument
+        data={data}
+        ownerUrlSlot={<OwnerUrlLink token={token} finalized={data.finalized === true} />}
+        ownerUrlPill={<OwnerUrlPill token={token} finalized={data.finalized === true} />}
+      />
       <BudouxApply />
       {print === '1' && <PrintOnLoad />}
     </>

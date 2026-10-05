@@ -12,6 +12,8 @@ import PdfDocument from '@/components/pdf/PdfDocument';
 import PrintOnLoad from '@/components/pdf/PrintOnLoad';
 import PdfHint from '@/components/pdf/PdfHint';
 import BudouxApply from '@/components/pdf/BudouxApply';
+import OwnerUrlLink from '@/components/pdf/OwnerUrlLink';
+import OwnerUrlPill from '@/components/pdf/OwnerUrlPill';
 import '../[token]/pdf.css';
 
 function PdfShareInner() {
@@ -36,7 +38,11 @@ function PdfShareInner() {
   return (
     <>
       <PdfHint />
-      <PdfDocument data={data} />
+      <PdfDocument
+        data={data}
+        ownerUrlSlot={<OwnerUrlLink encoded={encoded} finalized={data.finalized === true} />}
+        ownerUrlPill={<OwnerUrlPill encoded={encoded} finalized={data.finalized === true} />}
+      />
       <BudouxApply />
       {print && <PrintOnLoad />}
     </>

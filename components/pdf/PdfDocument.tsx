@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   FormData,
   DeptGoalData,
@@ -45,10 +46,11 @@ function textOrDash(v: string | undefined | null): string {
 }
 
 // P1 表紙
-function CoverPage({ data }: { data: FormData }) {
+function CoverPage({ data, ownerUrlSlot, ownerUrlPill }: { data: FormData; ownerUrlSlot?: ReactNode; ownerUrlPill?: ReactNode }) {
   const c = data.cover;
   return (
     <section className="pdf-page pdf-cover">
+      {ownerUrlPill}
       <div className="pdf-cover-scene" aria-hidden />
       <div className="pdf-cover-inner">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -63,6 +65,7 @@ function CoverPage({ data }: { data: FormData }) {
           <dt>グレード</dt>
           <dd>{textOrDash(c.grade)}</dd>
         </dl>
+        {ownerUrlSlot}
       </div>
       <div className="pdf-page-footer">
         <span>INSTYLE GROUP</span>
@@ -166,10 +169,11 @@ function DeptGoalCard({ data, title }: { data: DeptGoalData; title: string }) {
 }
 
 // P2 会社+部署
-function CompanyDeptPage({ data }: { data: FormData }) {
+function CompanyDeptPage({ data, ownerUrlPill }: { data: FormData; ownerUrlPill?: ReactNode }) {
   const dept2 = hasDeptContent(data.dept2);
   return (
     <section className="pdf-page">
+      {ownerUrlPill}
       <h2 className="pdf-page-title">01｜会社目標 &amp; 02｜部署目標</h2>
       <p className="pdf-page-lede">会社の骨太と、そこにぶら下がる部署ミッション・KGI・KPI。</p>
       <div className={dept2 ? 'pdf-grid-quad' : 'pdf-grid-2'}>
@@ -187,13 +191,14 @@ function CompanyDeptPage({ data }: { data: FormData }) {
 }
 
 // P3 個人目標
-function PersonalGoalPage({ data }: { data: FormData }) {
+function PersonalGoalPage({ data, ownerUrlPill }: { data: FormData; ownerUrlPill?: ReactNode }) {
   const p = data.personal;
   const slLabel: Record<string, string> = {
     S1: 'S1｜指示型', S2: 'S2｜コーチ型', S3: 'S3｜支援型', S4: 'S4｜委任型', '': '（未設定）',
   };
   return (
     <section className="pdf-page">
+      {ownerUrlPill}
       <h2 className="pdf-page-title">03｜個人目標</h2>
       <p className="pdf-page-lede">現在地 → SMART 目標 → SL 理論 → 上長からの一言。</p>
       <div className="pdf-grid-2" style={{ gridTemplateColumns: '1fr 1fr' }}>
@@ -413,9 +418,10 @@ function BonusCard({ data }: { data: BonusData }) {
   );
 }
 
-function GradeGuarantyPage({ data }: { data: FormData }) {
+function GradeGuarantyPage({ data, ownerUrlPill }: { data: FormData; ownerUrlPill?: ReactNode }) {
   return (
     <section className="pdf-page">
+      {ownerUrlPill}
       <h2 className="pdf-page-title">04〜07｜ギャランティ・グレード・昇格・ボーナス</h2>
       <p className="pdf-page-lede">今期のポジションと対価の全体像。</p>
       <div className="pdf-grid-quad">
@@ -432,13 +438,21 @@ function GradeGuarantyPage({ data }: { data: FormData }) {
   );
 }
 
-export default function PdfDocument({ data }: { data: FormData }) {
+export default function PdfDocument({
+  data,
+  ownerUrlSlot,
+  ownerUrlPill,
+}: {
+  data: FormData;
+  ownerUrlSlot?: ReactNode;
+  ownerUrlPill?: ReactNode;
+}) {
   return (
     <div className="pdf-doc">
-      <CoverPage data={data} />
-      <CompanyDeptPage data={data} />
-      <PersonalGoalPage data={data} />
-      <GradeGuarantyPage data={data} />
+      <CoverPage data={data} ownerUrlSlot={ownerUrlSlot} ownerUrlPill={ownerUrlPill} />
+      <CompanyDeptPage data={data} ownerUrlPill={ownerUrlPill} />
+      <PersonalGoalPage data={data} ownerUrlPill={ownerUrlPill} />
+      <GradeGuarantyPage data={data} ownerUrlPill={ownerUrlPill} />
     </div>
   );
 }
