@@ -12,6 +12,7 @@ import BonusForm from '@/components/forms/BonusForm';
 import { FormData, DeptGoalData } from '@/lib/types';
 import { baseFromPathname, buildShortShareUrl } from '@/lib/share-codec';
 import { appendTokenHistory } from '@/lib/token-history';
+import { exportDocx } from '@/lib/export-docx';
 
 const noop = () => {};
 
@@ -282,9 +283,17 @@ export default function ShareView({ data, token, encoded }: { data: FormData; to
                   type="button"
                   onClick={openPdf}
                   className="header-action"
-                  title="4 ページ PDF（表紙／会社+部署／個人／グレード+ギャランティ+昇格+ボーナス）を新規タブで開き印刷ダイアログを起動します"
+                  title="7 ページ PDF を新規タブで開き印刷ダイアログを起動します"
                 >
                   📄 PDF で保存
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void exportDocx(editable)}
+                  className="header-action"
+                  title="長文も切れない .docx を書き出します。Google Docs / Word で開けます"
+                >
+                  📝 DOCX でダウンロード
                 </button>
               </div>
             )}
