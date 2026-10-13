@@ -12,7 +12,7 @@ import BonusForm from '@/components/forms/BonusForm';
 import { FormData, DeptGoalData } from '@/lib/types';
 import { baseFromPathname, buildShortShareUrl } from '@/lib/share-codec';
 import { appendTokenHistory } from '@/lib/token-history';
-import { exportDocx } from '@/lib/export-docx';
+import { exportPptx } from '@/lib/export-pptx';
 
 const noop = () => {};
 
@@ -289,11 +289,11 @@ export default function ShareView({ data, token, encoded }: { data: FormData; to
                 </button>
                 <button
                   type="button"
-                  onClick={() => void exportDocx(editable)}
+                  onClick={() => void exportPptx(editable)}
                   className="header-action"
-                  title="長文も切れない .docx を書き出します。Google Docs / Word で開けます"
+                  title="PowerPoint 形式で書き出します。長文はスライドを編集して調整できます"
                 >
-                  📝 DOCX でダウンロード
+                  🖼 PPTX でダウンロード
                 </button>
               </div>
             )}
