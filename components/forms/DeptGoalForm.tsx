@@ -139,7 +139,7 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus, ti
             <tr>
               <th style={{ width: 120 }}>区分</th>
               <th>ミッション</th>
-              <th>KGI</th>
+              <th>KGI バリュー</th>
             </tr>
           </thead>
           <tbody>
@@ -161,7 +161,7 @@ export default function DeptGoalForm({ data, onChange, companyStrategicFocus, ti
                     style={{ padding: '6px 8px', fontSize: '.8125rem', minHeight: 72, resize: 'vertical' }}
                     value={data[item.key].kgi}
                     onChange={e => updateKgi(item.key, 'kgi', e.target.value)}
-                    placeholder="KGIを記入"
+                    placeholder="KGI バリューを記入"
                   />
                 </td>
               </tr>
